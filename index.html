@@ -7,6 +7,8 @@
   <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Thư viện Mammoth.js để đọc file Word (.docx) chuẩn font tiếng Việt 100% -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -28,16 +30,16 @@
         </div>
       </div>
       
-      <!-- Nút thao tác góc phải -->
+      <!-- Cổng giáo viên -->
       <div id="nav-actions" class="flex items-center space-x-2">
-        <button id="btn-login-modal" onclick="openLoginModal()" class="bg-indigo-800 hover:bg-indigo-900 px-3 py-1.5 rounded-lg text-sm font-medium border border-indigo-500 transition">
+        <button id="btn-login-modal" onclick="openLoginModal()" class="bg-indigo-800 hover:bg-indigo-900 px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-indigo-500 transition shadow">
           <i class="fa-solid fa-lock mr-1.5"></i> Cổng Giáo Viên
         </button>
         <div id="teacher-menu" class="hidden items-center space-x-2">
-          <span class="text-xs bg-indigo-900 text-indigo-200 px-2.5 py-1 rounded-full border border-indigo-500 font-medium">
+          <span class="text-xs bg-indigo-900 text-indigo-200 px-3 py-1 rounded-full border border-indigo-500 font-medium">
             <i class="fa-solid fa-user-check text-emerald-400 mr-1"></i> Giáo viên: Hồng Yến
           </span>
-          <button onclick="logoutTeacher()" class="bg-rose-600 hover:bg-rose-700 text-xs px-3 py-1.5 rounded-lg font-medium transition">
+          <button onclick="logoutTeacher()" class="bg-rose-600 hover:bg-rose-700 text-xs px-3 py-1.5 rounded-lg font-medium transition shadow">
             <i class="fa-solid fa-right-from-bracket mr-1"></i> Đăng xuất
           </button>
         </div>
@@ -46,88 +48,63 @@
   </header>
 
   <!-- Main Container -->
-  <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6">
+  <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6">
 
     <!-- 1. GIAO DIỆN HỌC SINH CHỌN ĐỀ THI -->
     <section id="section-home" class="space-y-6">
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center max-w-2xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center max-w-xl mx-auto">
         <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
           <i class="fa-solid fa-user-pen"></i>
         </div>
         <h2 class="text-2xl font-bold text-slate-800 mb-2">Phòng Thi Trực Tuyến Học Sinh</h2>
-        <p class="text-sm text-slate-500 mb-6">Vui lòng nhập họ tên, chọn lớp và chọn bài kiểm tra để bắt đầu.</p>
+        <p class="text-xs md:text-sm text-slate-500 mb-6">Nhập thông tin cá nhân và chọn bài kiểm tra để bắt đầu làm bài.</p>
         
         <div class="space-y-4 text-left">
           <div>
             <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Họ và tên học sinh *</label>
-            <input type="text" id="student-name" placeholder="Ví dụ: Nguyễn Văn An" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+            <input type="text" id="student-name" placeholder="Ví dụ: Nguyễn Văn An" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Lớp học *</label>
-            <input type="text" id="student-class" placeholder="Ví dụ: 9A1" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+            <input type="text" id="student-class" placeholder="Ví dụ: 7A1" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Chọn bài kiểm tra *</label>
-            <select id="student-exam-select" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white transition">
-              <!-- Render danh sách đề -->
+            <select id="student-exam-select" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white text-sm">
+              <!-- Render đề -->
             </select>
           </div>
-          <button onclick="startExam()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-200 transition mt-2 flex items-center justify-center">
+          <button onclick="startExam()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-200 transition mt-3 flex items-center justify-center text-sm md:text-base">
             <i class="fa-solid fa-play mr-2"></i> Bắt đầu làm bài
           </button>
         </div>
       </div>
-
-      <!-- Thông tin lưu ý -->
-      <div class="max-w-2xl mx-auto bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start space-x-3 text-amber-800 text-xs">
-        <i class="fa-solid fa-circle-info text-amber-500 mt-0.5 text-sm"></i>
-        <div>
-          <strong>Lưu ý đối với học sinh:</strong> Khi làm xong, bấm nộp bài để hệ thống ghi nhận. Đáp án và kết quả chấm điểm sẽ được giáo viên quản lý và công bố sau.
-        </div>
-      </div>
     </section>
 
-    <!-- 2. GIAO DIỆN LÀM BÀI CỦA HỌC SINH -->
+    <!-- 2. GIAO DIỆN PHÒNG THI HỌC SINH -->
     <section id="section-exam" class="hidden space-y-6">
-      <!-- Thanh thông tin bài thi -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap justify-between items-center gap-4 sticky top-16 z-40">
         <div>
-          <h2 id="exam-doing-title" class="text-lg font-bold text-slate-800">Bài Kiểm Tra</h2>
-          <p class="text-xs text-slate-500">Thí sinh: <span id="exam-doing-student" class="font-semibold text-slate-700"></span></p>
+          <h2 id="exam-doing-title" class="text-base md:text-lg font-bold text-slate-800">Bài Kiểm Tra</h2>
+          <p class="text-xs text-slate-500">Thí sinh: <span id="exam-doing-student" class="font-semibold text-indigo-700"></span></p>
         </div>
-        <div class="flex items-center space-x-4">
-          <div class="bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1.5 rounded-lg flex items-center font-mono font-bold text-base">
+        <div class="flex items-center space-x-3">
+          <div class="bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1.5 rounded-lg flex items-center font-mono font-bold text-sm md:text-base">
             <i class="fa-regular fa-clock mr-2"></i>
             <span id="countdown-timer">--:--</span>
           </div>
-          <button onclick="confirmSubmitExam()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow transition">
+          <button onclick="confirmSubmitExam()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-xs md:text-sm shadow transition">
             <i class="fa-solid fa-check mr-1.5"></i> Nộp bài
           </button>
         </div>
       </div>
 
-      <!-- File đính kèm đề thi nếu có -->
-      <div id="attached-file-box" class="hidden bg-indigo-50 border border-indigo-200 p-4 rounded-xl items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-file-lines text-2xl text-indigo-600"></i>
-          <div>
-            <p class="text-xs text-indigo-500 font-medium">Tệp đề thi giáo viên tải lên:</p>
-            <p id="attached-filename" class="text-sm font-bold text-slate-800">de_thi.pdf</p>
-          </div>
-        </div>
-        <a id="btn-download-attached" href="#" download class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3.5 py-2 rounded-lg font-medium transition flex items-center">
-          <i class="fa-solid fa-download mr-1.5"></i> Tải về / Mở file
-        </a>
-      </div>
-
-      <!-- Danh sách câu hỏi -->
-      <div id="questions-container" class="space-y-4">
-        <!-- Render động câu hỏi -->
-      </div>
+      <!-- Danh sách câu hỏi hiển thị -->
+      <div id="questions-container" class="space-y-6"></div>
 
       <div class="text-center py-4">
-        <button onclick="confirmSubmitExam()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold text-base shadow-lg shadow-emerald-200 transition">
-          <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Xác nhận hoàn thành & Nộp bài
+        <button onclick="confirmSubmitExam()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold text-sm md:text-base shadow-lg shadow-emerald-200 transition">
+          <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Hoàn thành & Nộp bài thi
         </button>
       </div>
     </section>
@@ -140,88 +117,82 @@
         </div>
         <h2 class="text-2xl font-bold text-slate-800">Đã nộp bài thành công!</h2>
         <p class="text-sm text-slate-600">
-          Bài làm của em <strong><span id="submitted-student-name"></span></strong> đã được lưu trữ an toàn vào hệ thống.
+          Bài làm của em <strong><span id="submitted-student-name"></span></strong> đã được gửi về hệ thống cho giáo viên.
         </p>
-        <p class="text-xs text-slate-400 border-t border-slate-100 pt-3">
-          Kết quả và bài làm chỉ giáo viên bộ môn mới có quyền truy cập và chấm điểm.
-        </p>
-        <div class="pt-4">
-          <button onclick="backToHome()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition">
-            Về trang chủ
-          </button>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-500 leading-relaxed text-left">
+          <i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i> <strong>Lưu ý:</strong> Bài làm trắc nghiệm và tự luận sẽ được cô giáo kiểm tra, chấm điểm và gửi lời nhận xét trực tiếp sau.
         </div>
+        <button onclick="backToHome()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition text-sm">
+          Về trang chủ
+        </button>
       </div>
     </section>
 
-    <!-- 4. DASHBOARD QUẢN LÝ DÀNH RIÊNG CHO GIÁO VIÊN (ĐÃ BẢO VỆ) -->
+    <!-- 4. DASHBOARD QUẢN LÝ DÀNH CHO GIÁO VIÊN -->
     <section id="section-teacher" class="hidden space-y-6">
       
-      <!-- Tabs Giáo viên -->
+      <!-- Tabs điều hướng -->
       <div class="flex space-x-2 border-b border-slate-200 pb-2">
-        <button onclick="switchTeacherTab('upload')" id="tab-btn-upload" class="px-4 py-2 font-semibold text-sm rounded-lg bg-indigo-600 text-white shadow">
-          <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Tạo / Tải Đề Thi
+        <button onclick="switchTeacherTab('upload')" id="tab-btn-upload" class="px-4 py-2 font-semibold text-xs md:text-sm rounded-lg bg-indigo-600 text-white shadow">
+          <i class="fa-solid fa-file-circle-plus mr-1.5"></i> Tạo / Upload Đề Thi
         </button>
-        <button onclick="switchTeacherTab('results')" id="tab-btn-results" class="px-4 py-2 font-semibold text-sm rounded-lg text-slate-600 hover:bg-slate-200">
-          <i class="fa-solid fa-square-poll-vertical mr-1.5"></i> Quản Lý Bài Học Sinh & Điểm (<span id="submission-count-badge">0</span>)
+        <button onclick="switchTeacherTab('results')" id="tab-btn-results" class="px-4 py-2 font-semibold text-xs md:text-sm rounded-lg text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-clipboard-check mr-1.5"></i> Danh Sách Bài Nộp & Chấm Điểm (<span id="submission-count-badge">0</span>)
         </button>
       </div>
 
-      <!-- Tab 1: Upload Đề -->
+      <!-- Tab 1: Tạo Đề & Upload -->
       <div id="teacher-tab-upload" class="space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          <!-- Box Upload file từ máy -->
           <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
             <h3 class="text-base font-bold text-slate-800 flex items-center">
-              <i class="fa-solid fa-file-circle-plus text-indigo-600 mr-2"></i> Tải đề thi từ máy tính (Mọi định dạng)
+              <i class="fa-solid fa-file-arrow-up text-indigo-600 mr-2"></i> Tải đề thi từ máy tính (Word .docx, Text, JSON)
             </h3>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Tên bài kiểm tra *</label>
-                <input type="text" id="new-exam-title" placeholder="VD: Kiểm tra 15 phút - Đại số 9" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input type="text" id="new-exam-title" placeholder="VD: Kiểm tra giữa kỳ môn Công Nghệ 7" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Thời gian làm bài (Phút)</label>
-                <input type="number" id="new-exam-duration" value="15" min="1" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input type="number" id="new-exam-duration" value="45" min="1" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
               </div>
             </div>
 
-            <!-- Khu vực kéo thả file -->
-            <div class="border-2 border-dashed border-slate-300 hover:border-indigo-400 bg-slate-50 hover:bg-indigo-50/40 rounded-2xl p-6 text-center cursor-pointer transition relative" onclick="document.getElementById('file-upload-input').click()">
-              <input type="file" id="file-upload-input" class="hidden" onchange="handleFileUpload(event)">
+            <!-- Upload File -->
+            <div class="border-2 border-dashed border-slate-300 hover:border-indigo-500 bg-slate-50 hover:bg-indigo-50/30 rounded-2xl p-6 text-center cursor-pointer transition relative" onclick="document.getElementById('file-upload-input').click()">
+              <input type="file" id="file-upload-input" class="hidden" accept=".docx,.txt,.json" onchange="handleFileUpload(event)">
               <div class="w-12 h-12 bg-white text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-sm text-xl">
-                <i class="fa-solid fa-upload"></i>
+                <i class="fa-solid fa-file-word"></i>
               </div>
-              <p class="text-sm font-semibold text-slate-700">Bấm để chọn file hoặc kéo thả tệp bất kỳ từ máy vi tính</p>
-              <p class="text-xs text-slate-500 mt-1">Hỗ trợ mọi định dạng: .txt, .json, .csv, .doc, .docx, .pdf, ảnh, zip...</p>
+              <p class="text-sm font-semibold text-slate-700">Bấm để chọn file Word (.docx) hoặc file .txt từ máy tính</p>
+              <p class="text-xs text-slate-400 mt-1">Đã tích hợp bộ xử lý font Unicode tiếng Việt và tự động tách riêng từng câu trắc nghiệm & tự luận</p>
               <div id="upload-status" class="mt-3 text-xs font-semibold text-indigo-700 hidden"></div>
             </div>
 
-            <!-- Soạn nhanh câu hỏi dạng text nếu muốn -->
+            <!-- Khung chỉnh sửa nội dung tách câu -->
             <div class="space-y-2">
               <div class="flex justify-between items-center">
                 <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                  Nội dung câu hỏi trắc nghiệm (Tự động nhận diện hoặc nhập tay):
+                  Nội dung đề (Hệ thống tự động tách câu trắc nghiệm và tự luận):
                 </label>
-                <button type="button" onclick="loadSampleQuestionsText()" class="text-xs text-indigo-600 hover:underline">
-                  <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Điền văn bản mẫu
+                <button type="button" onclick="loadSampleText()" class="text-xs text-indigo-600 hover:underline">
+                  <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Nạp đề mẫu hỗn hợp
                 </button>
               </div>
-              <textarea id="raw-questions-text" rows="8" placeholder="Câu 1: Thủ đô của Việt Nam là gì?
-A. TP.HCM
-B. Hà Nội
-C. Đà Nẵng
-D. Cần Thơ
-Đáp án: B
-Giải thích: Hà Nội là thủ đô của nước CHXHCN Việt Nam.
+              <textarea id="raw-questions-text" rows="12" placeholder="Hệ thống tự động nhận diện cả câu Trắc Nghiệm và Tự Luận:
 
-Câu 2: 15 + 25 = ?
-A. 30
-B. 35
-C. 40
-D. 45
-Đáp án: C" class="w-full p-3 font-mono text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none leading-relaxed"></textarea>
+Câu 1: Sản phẩm nào sau đây của ngành trồng trọt cung cấp lương thực cho con người?
+A. Cà phê, chè, cao su.
+B. Lúa, ngô, khoai, sắn.
+C. Cam, xoài, nhãn, vải.
+D. Rau cải, cà chua, hành.
+Đáp án: B
+
+Câu 2 (Tự luận): Em hãy nêu vai trò của ngành trồng trọt đối với đời sống con người và nền kinh tế?
+" class="w-full p-3 font-mono text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none leading-relaxed"></textarea>
             </div>
 
             <button onclick="saveNewExam()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl text-sm shadow transition flex items-center justify-center">
@@ -229,53 +200,53 @@ D. 45
             </button>
           </div>
 
-          <!-- Danh sách đề đã có -->
+          <!-- Danh sách đề đã lưu -->
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col">
             <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center">
-              <i class="fa-solid fa-list-check text-indigo-600 mr-2"></i> Danh Sách Đề Hiện Có
+              <i class="fa-solid fa-layer-group text-indigo-600 mr-2"></i> Các Đề Thi Hiện Có
             </h3>
-            <div id="teacher-exam-list" class="flex-grow space-y-3 overflow-y-auto max-h-[480px] custom-scrollbar pr-1">
-              <!-- Render đề -->
+            <div id="teacher-exam-list" class="flex-grow space-y-3 overflow-y-auto max-h-[500px] custom-scrollbar pr-1">
+              <!-- Render danh sách đề -->
             </div>
           </div>
 
         </div>
       </div>
 
-      <!-- Tab 2: Kết quả học sinh & Chấm điểm -->
+      <!-- Tab 2: Danh sách bài nộp của học sinh, chấm điểm và nhận xét -->
       <div id="teacher-tab-results" class="hidden space-y-6">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
             <div>
-              <h3 class="text-base font-bold text-slate-800">Bảng Điểm & Bài Làm Của Học Viên</h3>
-              <p class="text-xs text-slate-500">Chỉ giáo viên mới có thể xem chi tiết đáp án và chấm bài.</p>
+              <h3 class="text-base font-bold text-slate-800">Danh Sách Học Sinh Nộp Bài</h3>
+              <p class="text-xs text-slate-500">Giáo viên bấm "Xem & Chấm bài" để xem bài trắc nghiệm, chấm bài tự luận và ghi nhận xét.</p>
             </div>
             <div class="flex items-center space-x-2">
               <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3.5 py-2 rounded-lg font-medium transition flex items-center shadow-sm">
                 <i class="fa-solid fa-file-excel mr-1.5"></i> Xuất kết quả (Excel)
               </button>
               <button onclick="clearAllSubmissions()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs px-3 py-2 rounded-lg font-medium transition border border-rose-200">
-                <i class="fa-solid fa-trash-can mr-1"></i> Xóa toàn bộ kết quả
+                <i class="fa-solid fa-trash-can mr-1"></i> Xóa dữ liệu
               </button>
             </div>
           </div>
 
-          <!-- Bảng danh sách bài nộp -->
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-600">
               <thead class="bg-slate-50 text-xs uppercase text-slate-500 border-y border-slate-200">
                 <tr>
                   <th class="py-3 px-3">Học sinh</th>
                   <th class="py-3 px-2">Lớp</th>
-                  <th class="py-3 px-3">Bài kiểm tra</th>
+                  <th class="py-3 px-3">Đề kiểm tra</th>
                   <th class="py-3 px-2">Thời gian nộp</th>
-                  <th class="py-3 px-2 text-center">Số câu đúng</th>
-                  <th class="py-3 px-2 text-center">Điểm số</th>
+                  <th class="py-3 px-2 text-center">Trắc nghiệm</th>
+                  <th class="py-3 px-2 text-center">Điểm tổng</th>
+                  <th class="py-3 px-2">Nhận xét của GV</th>
                   <th class="py-3 px-3 text-center">Thao tác</th>
                 </tr>
               </thead>
               <tbody id="submission-table-body" class="divide-y divide-slate-100">
-                <!-- Render kết quả -->
+                <!-- Render kết quả nộp bài -->
               </tbody>
             </table>
           </div>
@@ -286,25 +257,25 @@ D. 45
 
   </main>
 
-  <!-- MODAL: ĐĂNG NHẬP GIÁO VIÊN (BẢO MẬT) -->
+  <!-- MODAL: ĐĂNG NHẬP GIÁO VIÊN -->
   <div id="modal-login" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
       <div class="text-center mb-5">
         <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
           <i class="fa-solid fa-user-shield"></i>
         </div>
-        <h3 class="text-lg font-bold text-slate-800">Xác thực quyền Giáo Viên</h3>
-        <p class="text-xs text-slate-500">Vui lòng nhập định danh để xem đáp án và quản lý</p>
+        <h3 class="text-lg font-bold text-slate-800">Cổng Quản Lý Giáo Viên</h3>
+        <p class="text-xs text-slate-500">Đăng nhập tài khoản để quản lý đề và chấm bài</p>
       </div>
       
       <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Tài khoản</label>
-          <input type="text" id="login-id" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          <input type="text" id="login-id" required class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Mật khẩu</label>
-          <input type="password" id="login-pass" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          <input type="password" id="login-pass" required class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
         <div id="login-error" class="text-xs text-rose-600 font-medium hidden">
           <i class="fa-solid fa-triangle-exclamation mr-1"></i> Tài khoản hoặc mật khẩu không chính xác!
@@ -321,23 +292,42 @@ D. 45
     </div>
   </div>
 
-  <!-- MODAL: XEM CHI TIẾT BÀI LÀM CỦA HỌC SINH (CHỈ GIÁO VIÊN XEM ĐƯỢC) -->
+  <!-- MODAL: XEM CHI TIẾT, CHẤM BÀI VÀ ĐỂ LẠI NHẬN XÉT -->
   <div id="modal-detail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
         <div>
-          <h3 class="text-base font-bold text-slate-800" id="detail-modal-title">Chi tiết bài thi học sinh</h3>
+          <h3 class="text-base font-bold text-slate-800" id="detail-modal-title">Chấm bài học sinh</h3>
           <p class="text-xs text-slate-500" id="detail-modal-sub"></p>
         </div>
         <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
-      <div class="p-6 overflow-y-auto space-y-4 custom-scrollbar flex-grow" id="detail-modal-content">
-        <!-- Render chi tiết từng câu học sinh làm -->
+
+      <!-- Khung chấm điểm & nhận xét của giáo viên -->
+      <div class="p-4 bg-amber-50/60 border-b border-amber-200 flex flex-wrap items-center gap-4">
+        <div class="flex items-center space-x-2">
+          <label class="text-xs font-bold text-slate-700 uppercase">Điểm số tổng kết:</label>
+          <input type="number" id="grading-score" step="0.25" min="0" max="10" class="w-20 px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-indigo-700 text-center bg-white">
+          <span class="text-xs text-slate-500">/ 10 điểm</span>
+        </div>
+        <div class="flex-grow flex items-center space-x-2 min-w-[280px]">
+          <label class="text-xs font-bold text-slate-700 uppercase whitespace-nowrap">Lời nhận xét của cô:</label>
+          <input type="text" id="grading-feedback" placeholder="Nhập lời khen hoặc dặn dò học sinh..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <button onclick="saveGradingResult()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2 rounded-lg font-semibold transition shadow">
+          <i class="fa-solid fa-floppy-disk mr-1"></i> Lưu chấm điểm & Nhận xét
+        </button>
       </div>
+
+      <!-- Nội dung bài làm học sinh -->
+      <div class="p-6 overflow-y-auto space-y-4 custom-scrollbar flex-grow" id="detail-modal-content">
+        <!-- Render chi tiết -->
+      </div>
+
       <div class="p-3 border-t border-slate-200 bg-slate-50 text-right">
-        <button onclick="closeDetailModal()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg">
+        <button onclick="closeDetailModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg">
           Đóng cửa sổ
         </button>
       </div>
@@ -346,59 +336,69 @@ D. 45
 
   <script>
     /* =========================================================
-       HỆ THỐNG DỮ LIỆU & BẢO MẬT
+       BẢO MẬT & DỮ LIỆU
        ========================================================= */
     const AUTH_ID = "HongyenTHCSBinhDuong";
     const AUTH_PASS = "123456";
 
-    // Khởi tạo cơ sở dữ liệu mẫu trong LocalStorage
-    let dbExams = JSON.parse(localStorage.getItem('edu_exams_data') || '[]');
-    let dbSubmissions = JSON.parse(localStorage.getItem('edu_submissions_data') || '[]');
-    let currentUploadedAttachment = null; // Tệp bất kỳ upload kèm theo đề
-
-    if (dbExams.length === 0) {
-      dbExams = [
-        {
-          id: 'exam_demo_01',
-          title: 'Khảo sát chất lượng Toán 9 - Bài mở đầu',
-          duration: 15,
-          createdAt: new Date().toISOString(),
-          attachment: null,
-          questions: [
-            {
-              id: 1,
-              question: "Căn bậc hai số học của 9 là bao nhiêu?",
-              options: ["3", "-3", "81", "±3"],
-              correct: 0,
-              explain: "Căn bậc hai số học của số a không âm là số x không âm sao cho x^2 = a. Do đó √9 = 3."
-            },
-            {
-              id: 2,
-              question: "Biểu thức √(2x - 4) có nghĩa khi nào?",
-              options: ["x ≥ 2", "x > 2", "x ≤ 2", "x = 2"],
-              correct: 0,
-              explain: "Biểu thức có nghĩa khi 2x - 4 ≥ 0 <=> 2x ≥ 4 <=> x ≥ 2."
-            },
-            {
-              id: 3,
-              question: "Kết quả của phép tính √(3 - 2√2) là:",
-              options: ["√2 - 1", "1 - √2", "3 - 2√2", "√2 + 1"],
-              correct: 0,
-              explain: "√(3 - 2√2) = √((√2 - 1)^2) = |√2 - 1| = √2 - 1 (do √2 > 1)."
-            }
-          ]
-        }
-      ];
-      localStorage.setItem('edu_exams_data', JSON.stringify(dbExams));
-    }
-
-    // Biến phiên thi của học sinh
+    let dbExams = JSON.parse(localStorage.getItem('edu_exams_data_v2') || '[]');
+    let dbSubmissions = JSON.parse(localStorage.getItem('edu_submissions_data_v2') || '[]');
+    let isTeacherLoggedIn = false;
     let currentExam = null;
     let studentInfo = { name: '', class: '' };
     let studentAnswers = {};
     let timerInterval = null;
     let timeRemaining = 0;
-    let isTeacherLoggedIn = false;
+    let currentViewingSubId = null;
+
+    // Dữ liệu mẫu đề thi chuẩn Công nghệ 7 (gồm cả Trắc nghiệm & Tự luận)
+    if (dbExams.length === 0) {
+      dbExams = [
+        {
+          id: 'exam_congnghe_01',
+          title: 'Kiểm tra 15 phút - Công nghệ 7 (Trồng trọt)',
+          duration: 15,
+          createdAt: new Date().toISOString(),
+          questions: [
+            {
+              id: 1,
+              type: 'choice',
+              question: "Sản phẩm nào sau đây là sản phẩm của ngành trồng trọt cung cấp lương thực cho con người?",
+              options: [
+                "Cà phê, chè, cao su.",
+                "Lúa, ngô, khoai, sắn.",
+                "Cam, xoài, nhãn, vải.",
+                "Rau cải, cà chua, hành."
+              ],
+              correct: 1,
+              explain: "Lúa, ngô, khoai, sắn là các cây lương thực chính cung cấp tinh bột cho con người."
+            },
+            {
+              id: 2,
+              type: 'choice',
+              question: "Loại cây nào sau đây thuộc nhóm cây ăn quả?",
+              options: [
+                "Cây lúa, cây ngô.",
+                "Cây cam, cây bưởi, cây xoài.",
+                "Cây cà phê, cây chè.",
+                "Cây rau muống, cây bắp cải."
+              ],
+              correct: 1,
+              explain: "Cam, bưởi, xoài là cây ăn quả."
+            },
+            {
+              id: 3,
+              type: 'essay',
+              question: "Em hãy nêu vai trò của ngành trồng trọt đối với đời sống con người và chăn nuôi ở gia đình hoặc địa phương em?",
+              options: [],
+              correct: null,
+              explain: "Cung cấp lương thực, thực phẩm cho con người; cung cấp thức ăn cho chăn nuôi; cung cấp nguyên liệu cho công nghiệp chế biến."
+            }
+          ]
+        }
+      ];
+      localStorage.setItem('edu_exams_data_v2', JSON.stringify(dbExams));
+    }
 
     /* =========================================================
        XÁC THỰC GIÁO VIÊN
@@ -441,9 +441,6 @@ D. 45
       renderStudentExamDropdown();
     }
 
-    /* =========================================================
-       ĐIỀU HƯỚNG MÀN HÌNH
-       ========================================================= */
     function showSection(name) {
       document.getElementById('section-home').classList.add('hidden');
       document.getElementById('section-exam').classList.add('hidden');
@@ -463,7 +460,219 @@ D. 45
     }
 
     /* =========================================================
-       HỌC SINH LÀM BÀI
+       THUẬT TOÁN TÁCH CÂU HỎI THÔNG MINH (TRẮC NGHIỆM & TỰ LUẬN)
+       ========================================================= */
+    function smartParseExamText(text) {
+      if (!text || !text.trim()) return [];
+
+      // Chuẩn hóa dòng, loại bỏ ký tự lạ từ Word
+      const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      
+      // Biểu thức tách câu hỗ trợ đa dạng định dạng:
+      // "Câu 1:", "Câu 1.", "Câu 1 (NB - Bài 1):", "Câu 2 (Tự luận):", "Bài 1:"
+      const questionRegex = /(?:^|\n)(?:Câu|Bài)\s*\d+[^:\n]*[:.]/gi;
+      
+      // Tìm tất cả vị trí bắt đầu của các câu
+      const matches = [];
+      let match;
+      while ((match = questionRegex.exec(normalized)) !== null) {
+        matches.push({ index: match.index, text: match[0] });
+      }
+
+      if (matches.length === 0) {
+        // Nếu không có chữ Câu 1, tự coi là 1 câu
+        return [{
+          id: 1,
+          type: 'essay',
+          question: normalized.trim(),
+          options: [],
+          correct: null,
+          explain: ""
+        }];
+      }
+
+      const questions = [];
+
+      for (let i = 0; i < matches.length; i++) {
+        const start = matches[i].index;
+        const end = (i + 1 < matches.length) ? matches[i + 1].index : normalized.length;
+        const rawBlock = normalized.substring(start, end).trim();
+
+        const lines = rawBlock.split('\n').map(l => l.trim()).filter(l => l);
+        if (lines.length === 0) continue;
+
+        // Dòng đầu tiên hoặc phần trước A. B. C. D là nội dung câu hỏi
+        let firstLine = lines[0];
+        // Bỏ phần "Câu X ... :" ở đầu để câu hỏi sạch đẹp
+        let qContent = firstLine.replace(/^(?:Câu|Bài)\s*\d+[^:\n]*[:.]\s*/i, '').trim();
+
+        // Kiểm tra xem câu này là Tự Luận hay Trắc Nghiệm
+        const isEssayExplicit = /tự\s*luận/i.test(firstLine);
+
+        let options = [];
+        let correctIndex = 0;
+        let explain = "";
+        let collectingExplain = false;
+
+        // Quét các dòng tiếp theo
+        for (let j = 1; j < lines.length; j++) {
+          const line = lines[j];
+
+          // Kiểm tra xem có phải dòng đáp án đúng không (VD: "Đáp án: B" hoặc "Chọn B")
+          const ansMatch = line.match(/^(?:Đáp án|Chọn|Key)[\:\s]+([A-D])/i);
+          if (ansMatch) {
+            const letter = ansMatch[1].toUpperCase();
+            correctIndex = ['A', 'B', 'C', 'D'].indexOf(letter);
+            if (correctIndex === -1) correctIndex = 0;
+            continue;
+          }
+
+          // Kiểm tra lời giải / hướng dẫn
+          const expMatch = line.match(/^(?:Lời giải|Giải thích|HD)[\:\s]+(.*)/i);
+          if (expMatch) {
+            explain = expMatch[1];
+            collectingExplain = true;
+            continue;
+          }
+          if (collectingExplain) {
+            explain += " " + line;
+            continue;
+          }
+
+          // Kiểm tra dòng đáp án lựa chọn: A. ... B. ... C. ... D. ...
+          // Hỗ trợ cả trường hợp 2 lựa chọn nằm trên cùng 1 dòng
+          const optRegex = /([A-D])[\.\:\)]\s*([^\n\rA-D\.\:\)]+(?:(?![A-D][\.\:\)]).)*)/gi;
+          let optMatches = [...line.matchAll(optRegex)];
+
+          if (optMatches.length > 0) {
+            optMatches.forEach(m => {
+              const optText = m[2].trim();
+              if (optText) options.push(optText);
+            });
+          } else {
+            // Nếu chưa có đáp án và không phải tự luận, ghép tiếp vào nội dung câu hỏi
+            if (options.length === 0) {
+              qContent += " " + line;
+            }
+          }
+        }
+
+        // Quyết định loại câu hỏi
+        const isEssay = isEssayExplicit || (options.length < 2);
+
+        questions.push({
+          id: i + 1,
+          type: isEssay ? 'essay' : 'choice',
+          question: qContent || `Nội dung câu hỏi ${i + 1}`,
+          options: isEssay ? [] : options.slice(0, 4), // Đảm bảo tối đa 4 lựa chọn A, B, C, D không bị tràn
+          correct: isEssay ? null : (correctIndex >= 0 ? correctIndex : 0),
+          explain: explain
+        });
+      }
+
+      return questions;
+    }
+
+    /* =========================================================
+       XỬ LÝ ĐỌC FILE WORD (.DOCX) CHUẨN FONT TIẾNG VIỆT
+       ========================================================= */
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById('upload-status');
+      statusEl.classList.remove('hidden');
+      statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang đọc file <strong>${file.name}</strong>...`;
+
+      const titleInput = document.getElementById('new-exam-title');
+      if (!titleInput.value) {
+        titleInput.value = file.name.replace(/\.[^/.]+$/, "");
+      }
+
+      const fileName = file.name.toLowerCase();
+
+      // Trường hợp 1: File Word .docx
+      if (fileName.endsWith('.docx')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const arrayBuffer = e.target.result;
+          mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+            .then(function(result) {
+              const text = result.value;
+              document.getElementById('raw-questions-text').value = text;
+              const parsed = smartParseExamText(text);
+              const choiceCount = parsed.filter(p => p.type === 'choice').length;
+              const essayCount = parsed.filter(p => p.type === 'essay').length;
+              statusEl.innerHTML = `✅ Đã đọc thành công file Word: Tách được <strong>${choiceCount} câu trắc nghiệm</strong> và <strong>${essayCount} câu tự luận</strong>!`;
+            })
+            .catch(function(err) {
+              statusEl.innerHTML = `<span class="text-rose-600">❌ Lỗi đọc file Word: ${err.message}</span>`;
+            });
+        };
+        reader.readAsArrayBuffer(file);
+      } 
+      // Trường hợp 2: File Text hoặc JSON
+      else {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const content = e.target.result;
+          document.getElementById('raw-questions-text').value = content;
+          const parsed = smartParseExamText(content);
+          statusEl.innerHTML = `✅ Đã nạp dữ liệu: Nhận diện ${parsed.length} câu hỏi.`;
+        };
+        reader.readAsText(file, 'utf-8');
+      }
+    }
+
+    function saveNewExam() {
+      const title = document.getElementById('new-exam-title').value.trim();
+      const duration = parseInt(document.getElementById('new-exam-duration').value) || 15;
+      const rawText = document.getElementById('raw-questions-text').value;
+
+      if (!title) {
+        alert('Vui lòng nhập tên bài kiểm tra!');
+        return;
+      }
+
+      const questions = smartParseExamText(rawText);
+
+      if (questions.length === 0) {
+        alert('Chưa có câu hỏi nào được tạo! Vui lòng tải file hoặc nhập văn bản câu hỏi.');
+        return;
+      }
+
+      const newExam = {
+        id: 'exam_' + Date.now(),
+        title: title,
+        duration: duration,
+        createdAt: new Date().toISOString(),
+        questions: questions
+      };
+
+      dbExams.unshift(newExam);
+      localStorage.setItem('edu_exams_data_v2', JSON.stringify(dbExams));
+
+      document.getElementById('new-exam-title').value = '';
+      document.getElementById('raw-questions-text').value = '';
+      document.getElementById('file-upload-input').value = '';
+      document.getElementById('upload-status').classList.add('hidden');
+
+      alert(`Đã lưu bài thi "${title}" thành công với ${questions.length} câu hỏi!`);
+      renderTeacherDashboard();
+      renderStudentExamDropdown();
+    }
+
+    function deleteExam(id) {
+      if (confirm('Bạn có chắc muốn xóa bài kiểm tra này không?')) {
+        dbExams = dbExams.filter(e => e.id !== id);
+        localStorage.setItem('edu_exams_data_v2', JSON.stringify(dbExams));
+        renderTeacherDashboard();
+        renderStudentExamDropdown();
+      }
+    }
+
+    /* =========================================================
+       GIAO DIỆN LÀM BÀI HỌC SINH (TRẮC NGHIỆM & TỰ LUẬN)
        ========================================================= */
     function renderStudentExamDropdown() {
       const select = document.getElementById('student-exam-select');
@@ -502,20 +711,7 @@ D. 45
       studentAnswers = {};
 
       document.getElementById('exam-doing-title').textContent = currentExam.title;
-      document.getElementById('exam-doing-student').textContent = `${name} - Lớp: ${sClass}`;
-
-      // Xử lý nếu đề có đính kèm file (PDF, Docx, Ảnh...)
-      const attachedBox = document.getElementById('attached-file-box');
-      if (currentExam.attachment) {
-        attachedBox.classList.remove('hidden');
-        attachedBox.classList.add('flex');
-        document.getElementById('attached-filename').textContent = currentExam.attachment.name;
-        document.getElementById('btn-download-attached').href = currentExam.attachment.dataUrl;
-        document.getElementById('btn-download-attached').download = currentExam.attachment.name;
-      } else {
-        attachedBox.classList.add('hidden');
-        attachedBox.classList.remove('flex');
-      }
+      document.getElementById('exam-doing-student').textContent = `${name} (Lớp: ${sClass})`;
 
       renderQuestionsForStudent();
       startTimer(currentExam.duration * 60);
@@ -526,46 +722,60 @@ D. 45
       const container = document.getElementById('questions-container');
       container.innerHTML = '';
 
-      if (!currentExam.questions || currentExam.questions.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white p-8 rounded-xl border border-slate-200 text-center">
-            <p class="text-slate-600 font-medium">Đề thi này không có câu hỏi trắc nghiệm tự động. Vui lòng tải file đính kèm phía trên để làm bài!</p>
-          </div>
-        `;
-        return;
-      }
+      const labels = ['A', 'B', 'C', 'D'];
 
       currentExam.questions.forEach((q, idx) => {
         const qCard = document.createElement('div');
-        qCard.className = "bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3";
-        
-        let optsHtml = '';
-        const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
-        q.options.forEach((opt, oIdx) => {
-          optsHtml += `
-            <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 hover:bg-indigo-50/40 cursor-pointer transition">
-              <input type="radio" name="question_${q.id}" value="${oIdx}" onchange="selectAnswer(${q.id}, ${oIdx})" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
-              <span class="font-bold text-xs text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${labels[oIdx]}</span>
-              <span class="text-sm text-slate-700">${opt}</span>
-            </label>
-          `;
-        });
+        qCard.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4";
 
-        qCard.innerHTML = `
-          <div class="flex items-start space-x-2">
-            <span class="bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-md">Câu ${idx + 1}</span>
-            <div class="text-sm md:text-base font-semibold text-slate-800">${q.question}</div>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
-            ${optsHtml}
-          </div>
-        `;
+        if (q.type === 'choice') {
+          // Giao diện trắc nghiệm: 4 phương án độc lập rõ ràng
+          let optsHtml = '';
+          q.options.forEach((opt, oIdx) => {
+            optsHtml += `
+              <label class="flex items-center space-x-3 p-3.5 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/30 cursor-pointer transition">
+                <input type="radio" name="question_${q.id}" value="${oIdx}" onchange="selectAnswer(${q.id}, ${oIdx})" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                <span class="font-bold text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 w-6 h-6 flex items-center justify-center rounded-lg">${labels[oIdx]}</span>
+                <span class="text-sm text-slate-700 font-medium">${opt}</span>
+              </label>
+            `;
+          });
+
+          qCard.innerHTML = `
+            <div class="flex items-start space-x-2">
+              <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Câu ${idx + 1} (Trắc nghiệm)</span>
+              <div class="text-sm md:text-base font-semibold text-slate-800 leading-snug">${q.question}</div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+              ${optsHtml}
+            </div>
+          `;
+        } else {
+          // Giao diện tự luận: Có ô gõ câu trả lời
+          qCard.innerHTML = `
+            <div class="flex items-start space-x-2">
+              <span class="bg-amber-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Câu ${idx + 1} (Tự luận)</span>
+              <div class="text-sm md:text-base font-semibold text-slate-800 leading-snug">${q.question}</div>
+            </div>
+            <div class="pt-2">
+              <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                <i class="fa-solid fa-pencil mr-1"></i> Bài làm tự luận của em:
+              </label>
+              <textarea oninput="saveEssayAnswer(${q.id}, this.value)" rows="4" placeholder="Nhập câu trả lời chi tiết của em vào đây..." class="w-full p-3 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none leading-relaxed"></textarea>
+            </div>
+          `;
+        }
+
         container.appendChild(qCard);
       });
     }
 
     function selectAnswer(qid, optIndex) {
       studentAnswers[qid] = optIndex;
+    }
+
+    function saveEssayAnswer(qid, val) {
+      studentAnswers[qid] = val;
     }
 
     function startTimer(seconds) {
@@ -578,7 +788,7 @@ D. 45
         updateTimerDisplay();
         if (timeRemaining <= 0) {
           clearInterval(timerInterval);
-          alert('Đã hết thời gian làm bài! Hệ thống sẽ tự động lưu bài.');
+          alert('Đã hết thời gian làm bài! Hệ thống tự động nộp bài.');
           submitExam();
         }
       }, 1000);
@@ -592,7 +802,7 @@ D. 45
     }
 
     function confirmSubmitExam() {
-      if (confirm('Em có chắc chắn muốn hoàn thành và nộp bài kiểm tra này không?')) {
+      if (confirm('Em có chắc chắn muốn nộp bài kiểm tra không?')) {
         submitExam();
       }
     }
@@ -600,21 +810,31 @@ D. 45
     function submitExam() {
       clearInterval(timerInterval);
 
-      // Tính điểm
-      let correctCount = 0;
-      const total = currentExam.questions ? currentExam.questions.length : 0;
+      // Tự động chấm phần trắc nghiệm
+      let choiceCorrectCount = 0;
+      let choiceTotal = 0;
+      let essayTotal = 0;
 
-      if (total > 0) {
-        currentExam.questions.forEach(q => {
+      currentExam.questions.forEach(q => {
+        if (q.type === 'choice') {
+          choiceTotal++;
           if (studentAnswers[q.id] !== undefined && studentAnswers[q.id] === q.correct) {
-            correctCount++;
+            choiceCorrectCount++;
           }
-        });
+        } else {
+          essayTotal++;
+        }
+      });
+
+      // Nếu chỉ có trắc nghiệm thì tính điểm thang 10, nếu có tự luận thì điểm sơ bộ = điểm trắc nghiệm để cô chấm tiếp
+      let initialScore = 0;
+      if (choiceTotal > 0 && essayTotal === 0) {
+        initialScore = ((choiceCorrectCount / choiceTotal) * 10).toFixed(1);
+      } else if (choiceTotal > 0 && essayTotal > 0) {
+        // Tạm tính trắc nghiệm chiếm 5 điểm hoặc theo tỷ lệ
+        initialScore = ((choiceCorrectCount / choiceTotal) * 5).toFixed(1);
       }
 
-      const score = total > 0 ? ((correctCount / total) * 10).toFixed(2) : 0;
-
-      // Lưu trữ thông tin bài nộp
       const submission = {
         id: 'sub_' + Date.now(),
         examId: currentExam.id,
@@ -623,15 +843,17 @@ D. 45
         studentClass: studentInfo.class,
         submittedAt: new Date().toLocaleString('vi-VN'),
         answers: { ...studentAnswers },
-        correctCount: correctCount,
-        totalQuestions: total,
-        score: score
+        choiceCorrect: choiceCorrectCount,
+        choiceTotal: choiceTotal,
+        essayTotal: essayTotal,
+        score: initialScore,
+        teacherFeedback: "",
+        isGraded: essayTotal === 0 // Nếu không có tự luận thì coi như đã chấm xong
       };
 
       dbSubmissions.push(submission);
-      localStorage.setItem('edu_submissions_data', JSON.stringify(dbSubmissions));
+      localStorage.setItem('edu_submissions_data_v2', JSON.stringify(dbSubmissions));
 
-      // Hiển thị màn hình hoàn thành cho học sinh (Tuyệt đối KHÔNG hiển thị điểm hay đáp án)
       document.getElementById('submitted-student-name').textContent = studentInfo.name;
       showSection('finished');
     }
@@ -643,203 +865,45 @@ D. 45
     }
 
     /* =========================================================
-       GIÁO VIÊN: TẢI ĐỀ BẤT KỲ ĐỊNH DẠNG & QUẢN LÝ
+       GIÁO VIÊN: QUẢN LÝ, CHẤM BÀI VÀ NHẬN XÉT
        ========================================================= */
     function switchTeacherTab(tab) {
       if (tab === 'upload') {
         document.getElementById('teacher-tab-upload').classList.remove('hidden');
         document.getElementById('teacher-tab-results').classList.add('hidden');
-        document.getElementById('tab-btn-upload').className = "px-4 py-2 font-semibold text-sm rounded-lg bg-indigo-600 text-white shadow";
-        document.getElementById('tab-btn-results').className = "px-4 py-2 font-semibold text-sm rounded-lg text-slate-600 hover:bg-slate-200";
+        document.getElementById('tab-btn-upload').className = "px-4 py-2 font-semibold text-xs md:text-sm rounded-lg bg-indigo-600 text-white shadow";
+        document.getElementById('tab-btn-results').className = "px-4 py-2 font-semibold text-xs md:text-sm rounded-lg text-slate-600 hover:bg-slate-200";
       } else {
         document.getElementById('teacher-tab-upload').classList.add('hidden');
         document.getElementById('teacher-tab-results').classList.remove('hidden');
-        document.getElementById('tab-btn-results').className = "px-4 py-2 font-semibold text-sm rounded-lg bg-indigo-600 text-white shadow";
-        document.getElementById('tab-btn-upload').className = "px-4 py-2 font-semibold text-sm rounded-lg text-slate-600 hover:bg-slate-200";
+        document.getElementById('tab-btn-results').className = "px-4 py-2 font-semibold text-xs md:text-sm rounded-lg bg-indigo-600 text-white shadow";
+        document.getElementById('tab-btn-upload').className = "px-4 py-2 font-semibold text-xs md:text-sm rounded-lg text-slate-600 hover:bg-slate-200";
         renderSubmissionsTable();
       }
     }
 
-    // Xử lý upload mọi loại file
-    function handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const statusEl = document.getElementById('upload-status');
-      statusEl.classList.remove('hidden');
-      statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang tải và phân tích tệp: <strong>${file.name}</strong>...`;
-
-      // Đặt tên đề mặc định nếu chưa nhập
-      const titleInput = document.getElementById('new-exam-title');
-      if (!titleInput.value) {
-        titleInput.value = file.name.replace(/\.[^/.]+$/, "");
-      }
-
-      // Lưu file dưới dạng DataURL để học sinh có thể tải về được bất kể định dạng nào
-      const readerData = new FileReader();
-      readerData.onload = function(e) {
-        currentUploadedAttachment = {
-          name: file.name,
-          type: file.type,
-          dataUrl: e.target.result
-        };
-      };
-      readerData.readAsDataURL(file);
-
-      // Thử đọc văn bản nếu là file dạng text/json/csv
-      const textReader = new FileReader();
-      textReader.onload = function(e) {
-        const content = e.target.result;
-        try {
-          // Thử parse JSON
-          const parsed = JSON.parse(content);
-          if (Array.isArray(parsed) || parsed.questions) {
-            statusEl.innerHTML = `✅ Nhận diện thành công cấu trúc đề JSON (${(parsed.questions || parsed).length} câu).`;
-            document.getElementById('raw-questions-text').value = content;
-            return;
-          }
-        } catch (err) {}
-
-        // Nếu là text thông thường, đưa vào ô nhập liệu để parser quét câu hỏi
-        document.getElementById('raw-questions-text').value = content;
-        statusEl.innerHTML = `✅ Đã nạp nội dung văn bản từ tệp <strong>${file.name}</strong>.`;
-      };
-      
-      // Đọc dạng text (nếu file nhị phân như PDF/Docx thì vẫn lưu attachment để học sinh mở trực tiếp)
-      textReader.readAsText(file);
-    }
-
-    // Tự động phân tích chuỗi văn bản thành câu hỏi
-    function parseQuestionsFromRawText(text) {
-      if (!text || !text.trim()) return [];
-
-      // Kiểm tra xem có phải JSON không
-      try {
-        const json = JSON.parse(text);
-        if (Array.isArray(json)) return json;
-        if (json.questions && Array.isArray(json.questions)) return json.questions;
-      } catch (e) {}
-
-      // Phân tích dạng văn bản Câu 1, Câu 2... A, B, C, D
-      const questions = [];
-      const blocks = text.split(/(?=Câu\s*\d+[:.])/gi);
-
-      blocks.forEach((block, idx) => {
-        const trimmed = block.trim();
-        if (!trimmed) return;
-
-        const lines = trimmed.split('\n').map(l => l.trim()).filter(l => l);
-        let qTitle = lines[0] || `Câu hỏi ${idx + 1}`;
-        // Lược bỏ chữ Câu 1: nếu muốn gọn
-        qTitle = qTitle.replace(/^Câu\s*\d+[:.]\s*/i, '');
-
-        let options = [];
-        let correct = 0;
-        let explain = "";
-
-        lines.slice(1).forEach(line => {
-          const optMatch = line.match(/^([A-D])[\.\:\)]\s*(.*)/i);
-          const ansMatch = line.match(/^Đáp án[\:\s]+([A-D])/i);
-          const expMatch = line.match(/^Giải thích[\:\s]+(.*)/i);
-
-          if (optMatch) {
-            options.push(optMatch[2]);
-          } else if (ansMatch) {
-            const letter = ansMatch[1].toUpperCase();
-            correct = ['A', 'B', 'C', 'D'].indexOf(letter);
-            if (correct === -1) correct = 0;
-          } else if (expMatch) {
-            explain = expMatch[1];
-          }
-        });
-
-        if (options.length >= 2) {
-          questions.push({
-            id: idx + 1,
-            question: qTitle,
-            options: options,
-            correct: correct,
-            explain: explain || "Đáp án chính xác do giáo viên chỉ định."
-          });
-        }
-      });
-
-      return questions;
-    }
-
-    function saveNewExam() {
-      const title = document.getElementById('new-exam-title').value.trim();
-      const duration = parseInt(document.getElementById('new-exam-duration').value) || 15;
-      const rawText = document.getElementById('raw-questions-text').value;
-
-      if (!title) {
-        alert('Vui lòng nhập Tên bài kiểm tra!');
-        return;
-      }
-
-      const questions = parseQuestionsFromRawText(rawText);
-
-      if (questions.length === 0 && !currentUploadedAttachment) {
-        alert('Vui lòng tải tệp đề bài lên hoặc nhập ít nhất một câu hỏi trắc nghiệm!');
-        return;
-      }
-
-      const newExam = {
-        id: 'exam_' + Date.now(),
-        title: title,
-        duration: duration,
-        createdAt: new Date().toISOString(),
-        attachment: currentUploadedAttachment,
-        questions: questions
-      };
-
-      dbExams.unshift(newExam);
-      localStorage.setItem('edu_exams_data', JSON.stringify(dbExams));
-
-      // Reset form
-      document.getElementById('new-exam-title').value = '';
-      document.getElementById('raw-questions-text').value = '';
-      document.getElementById('file-upload-input').value = '';
-      document.getElementById('upload-status').classList.add('hidden');
-      currentUploadedAttachment = null;
-
-      alert(`Đã lưu bài kiểm tra "${title}" thành công!`);
-      renderTeacherDashboard();
-      renderStudentExamDropdown();
-    }
-
-    function deleteExam(id) {
-      if (confirm('Bạn có chắc muốn xóa bài kiểm tra này?')) {
-        dbExams = dbExams.filter(e => e.id !== id);
-        localStorage.setItem('edu_exams_data', JSON.stringify(dbExams));
-        renderTeacherDashboard();
-        renderStudentExamDropdown();
-      }
-    }
-
     function renderTeacherDashboard() {
-      // Cập nhật số bài nộp
       document.getElementById('submission-count-badge').textContent = dbSubmissions.length;
-
-      // Danh sách đề thi
       const listEl = document.getElementById('teacher-exam-list');
       listEl.innerHTML = '';
 
       if (dbExams.length === 0) {
-        listEl.innerHTML = '<p class="text-xs text-slate-400 italic">Chưa có đề nào.</p>';
+        listEl.innerHTML = '<p class="text-xs text-slate-400 italic">Chưa có bài kiểm tra nào.</p>';
         return;
       }
 
       dbExams.forEach(exam => {
-        const qCount = exam.questions ? exam.questions.length : 0;
+        const choiceCount = exam.questions.filter(q => q.type === 'choice').length;
+        const essayCount = exam.questions.filter(q => q.type === 'essay').length;
+
         const item = document.createElement('div');
-        item.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs";
+        item.className = "p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs";
         item.innerHTML = `
-          <div class="space-y-0.5 max-w-[70%]">
+          <div class="space-y-1 max-w-[75%]">
             <h4 class="font-bold text-slate-800 truncate">${exam.title}</h4>
-            <p class="text-slate-500">${qCount} câu hỏi • ${exam.duration} phút ${exam.attachment ? '• 📎 Đính kèm tệp' : ''}</p>
+            <p class="text-slate-500">${choiceCount} Trắc nghiệm • ${essayCount} Tự luận • ${exam.duration} phút</p>
           </div>
-          <button onclick="deleteExam('${exam.id}')" class="text-rose-600 hover:text-rose-800 p-1.5" title="Xóa đề">
+          <button onclick="deleteExam('${exam.id}')" class="text-rose-500 hover:text-rose-700 p-2" title="Xóa đề">
             <i class="fa-solid fa-trash"></i>
           </button>
         `;
@@ -847,7 +911,6 @@ D. 45
       });
     }
 
-    // Bảng nộp bài của học sinh
     function renderSubmissionsTable() {
       const tbody = document.getElementById('submission-table-body');
       tbody.innerHTML = '';
@@ -855,13 +918,12 @@ D. 45
       if (dbSubmissions.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="py-8 text-center text-slate-400 italic">Chưa có học sinh nào nộp bài.</td>
+            <td colspan="8" class="py-8 text-center text-slate-400 italic">Chưa có bài làm nào của học sinh.</td>
           </tr>
         `;
         return;
       }
 
-      // Sắp xếp bài mới nhất lên đầu
       const sorted = [...dbSubmissions].reverse();
 
       sorted.forEach(sub => {
@@ -869,21 +931,26 @@ D. 45
         tr.className = "hover:bg-slate-50/80 transition";
         tr.innerHTML = `
           <td class="py-3 px-3 font-semibold text-slate-800">${sub.studentName}</td>
-          <td class="py-3 px-2">${sub.studentClass}</td>
-          <td class="py-3 px-3 text-indigo-700 font-medium truncate max-w-xs">${sub.examTitle}</td>
+          <td class="py-3 px-2 font-medium">${sub.studentClass}</td>
+          <td class="py-3 px-3 text-indigo-700 font-medium truncate max-w-[180px]">${sub.examTitle}</td>
           <td class="py-3 px-2 text-xs text-slate-400">${sub.submittedAt}</td>
-          <td class="py-3 px-2 text-center font-semibold text-slate-700">${sub.correctCount}/${sub.totalQuestions}</td>
+          <td class="py-3 px-2 text-center text-xs font-semibold text-slate-700">
+            ${sub.choiceTotal > 0 ? `${sub.choiceCorrect}/${sub.choiceTotal} câu` : 'Không có'}
+          </td>
           <td class="py-3 px-2 text-center">
             <span class="inline-block px-2.5 py-1 rounded-full text-xs font-bold ${
               sub.score >= 8 ? 'bg-emerald-100 text-emerald-800' :
               sub.score >= 5 ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
             }">
-              ${sub.score}
+              ${sub.score} đ
             </span>
           </td>
+          <td class="py-3 px-2 text-xs text-slate-600 max-w-[200px] truncate" title="${sub.teacherFeedback || ''}">
+            ${sub.teacherFeedback ? `<span class="text-indigo-600 font-medium">💬 ${sub.teacherFeedback}</span>` : '<span class="text-slate-400 italic">Chưa nhận xét</span>'}
+          </td>
           <td class="py-3 px-3 text-center">
-            <button onclick="viewSubmissionDetail('${sub.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg text-xs font-medium border border-indigo-200 transition">
-              <i class="fa-solid fa-eye mr-1"></i> Xem bài làm
+            <button onclick="openGradingModal('${sub.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-medium border border-indigo-200 transition shadow-sm">
+              <i class="fa-solid fa-pen-to-square mr-1"></i> Xem & Chấm bài
             </button>
           </td>
         `;
@@ -891,66 +958,86 @@ D. 45
       });
     }
 
-    // Modal xem chi tiết từng câu của học sinh
-    function viewSubmissionDetail(subId) {
+    // Mở modal chấm bài & ghi nhận xét
+    function openGradingModal(subId) {
+      currentViewingSubId = subId;
       const sub = dbSubmissions.find(s => s.id === subId);
       if (!sub) return;
 
       const exam = dbExams.find(e => e.id === sub.examId);
+
+      document.getElementById('detail-modal-title').textContent = `Chấm bài: ${sub.studentName} - Lớp ${sub.studentClass}`;
+      document.getElementById('detail-modal-sub').textContent = `Bài kiểm tra: ${sub.examTitle} • Nộp lúc: ${sub.submittedAt}`;
       
-      document.getElementById('detail-modal-title').textContent = `Bài làm của: ${sub.studentName} (Lớp ${sub.studentClass})`;
-      document.getElementById('detail-modal-sub').textContent = `Đề thi: ${sub.examTitle} • Điểm số: ${sub.score}/10 (${sub.correctCount}/${sub.totalQuestions} câu đúng)`;
+      document.getElementById('grading-score').value = sub.score;
+      document.getElementById('grading-feedback').value = sub.teacherFeedback || '';
 
       const container = document.getElementById('detail-modal-content');
       container.innerHTML = '';
 
-      if (!exam || !exam.questions || exam.questions.length === 0) {
-        container.innerHTML = '<p class="text-sm text-slate-500">Đề bài không có câu hỏi trắc nghiệm tự động.</p>';
+      if (!exam || !exam.questions) {
+        container.innerHTML = '<p class="text-sm text-slate-400">Không tìm thấy thông tin đề bài.</p>';
       } else {
-        const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+        const labels = ['A', 'B', 'C', 'D'];
         exam.questions.forEach((q, idx) => {
-          const studentAns = sub.answers[q.id];
-          const isCorrect = studentAns !== undefined && studentAns === q.correct;
-          const isAnswered = studentAns !== undefined;
-
           const card = document.createElement('div');
-          card.className = `p-4 rounded-xl border ${isCorrect ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200'} space-y-2 text-xs`;
+          
+          if (q.type === 'choice') {
+            const studentAns = sub.answers[q.id];
+            const isCorrect = (studentAns !== undefined && studentAns === q.correct);
+            const isAnswered = studentAns !== undefined;
 
-          let optionsHtml = '';
-          q.options.forEach((opt, oIdx) => {
-            let optStyle = "border-slate-200 bg-white text-slate-700";
-            if (oIdx === q.correct) {
-              optStyle = "border-emerald-500 bg-emerald-100 font-bold text-emerald-800";
-            }
-            if (oIdx === studentAns && studentAns !== q.correct) {
-              optStyle = "border-rose-400 bg-rose-100 font-bold text-rose-800 line-through";
-            }
+            card.className = `p-4 rounded-xl border ${isCorrect ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200'} space-y-2 text-xs`;
 
-            optionsHtml += `
-              <div class="p-2 rounded-lg border ${optStyle} flex items-center justify-between">
-                <span><strong>${labels[oIdx]}.</strong> ${opt}</span>
-                ${oIdx === q.correct ? '<span class="text-emerald-700 font-bold"><i class="fa-solid fa-check"></i> Đáp án đúng</span>' : ''}
-                ${oIdx === studentAns && studentAns !== q.correct ? '<span class="text-rose-700 font-bold"><i class="fa-solid fa-xmark"></i> Học sinh chọn</span>' : ''}
+            let optionsHtml = '';
+            q.options.forEach((opt, oIdx) => {
+              let optStyle = "border-slate-200 bg-white text-slate-700";
+              if (oIdx === q.correct) {
+                optStyle = "border-emerald-500 bg-emerald-100 font-bold text-emerald-800";
+              }
+              if (oIdx === studentAns && studentAns !== q.correct) {
+                optStyle = "border-rose-400 bg-rose-100 font-bold text-rose-800 line-through";
+              }
+
+              optionsHtml += `
+                <div class="p-2 rounded-lg border ${optStyle} flex items-center justify-between">
+                  <span><strong>${labels[oIdx]}.</strong> ${opt}</span>
+                  ${oIdx === q.correct ? '<span class="text-emerald-700 font-bold"><i class="fa-solid fa-check"></i> Đáp án đúng</span>' : ''}
+                  ${oIdx === studentAns && studentAns !== q.correct ? '<span class="text-rose-700 font-bold"><i class="fa-solid fa-xmark"></i> Học sinh chọn</span>' : ''}
+                </div>
+              `;
+            });
+
+            card.innerHTML = `
+              <div class="flex justify-between items-start">
+                <span class="font-bold text-slate-800 text-sm">Câu ${idx + 1} (Trắc nghiệm): ${q.question}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
+                  ${isCorrect ? 'ĐÚNG' : (isAnswered ? 'SAI' : 'CHƯA TRẢ LỜI')}
+                </span>
               </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
+                ${optionsHtml}
+              </div>
+              ${q.explain ? `<div class="p-2 bg-white rounded border border-slate-200 text-slate-600 mt-2"><strong>Giải thích:</strong> ${q.explain}</div>` : ''}
             `;
-          });
+          } else {
+            // Hiển thị phần Tự Luận của học sinh
+            const essayAnswer = sub.answers[q.id] || '<span class="text-rose-500 italic">Học sinh không điền câu trả lời</span>';
 
-          card.innerHTML = `
-            <div class="flex justify-between items-start">
-              <span class="font-bold text-slate-800 text-sm">Câu ${idx + 1}: ${q.question}</span>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
-                ${isCorrect ? 'ĐÚNG' : (isAnswered ? 'SAI' : 'CHƯA TRẢ LỜI')}
-              </span>
-            </div>
-            <div class="space-y-1.5 pt-1">
-              ${optionsHtml}
-            </div>
-            ${q.explain ? `
-              <div class="bg-white/80 p-2 rounded border border-slate-200 text-slate-600 mt-2">
-                <strong>Lời giải / Ghi chú:</strong> ${q.explain}
+            card.className = "p-4 rounded-xl border border-amber-200 bg-amber-50/30 space-y-2 text-xs";
+            card.innerHTML = `
+              <div class="flex justify-between items-start">
+                <span class="font-bold text-slate-800 text-sm">Câu ${idx + 1} (Tự luận): ${q.question}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600 text-white">TỰ LUẬN</span>
               </div>
-            ` : ''}
-          `;
+              <div class="p-3 bg-white rounded-xl border border-slate-200 mt-2">
+                <p class="text-xs font-bold text-indigo-700 mb-1"><i class="fa-solid fa-file-lines mr-1"></i> Bài làm của học sinh:</p>
+                <div class="text-slate-800 text-sm whitespace-pre-line leading-relaxed">${essayAnswer}</div>
+              </div>
+              ${q.explain ? `<div class="p-2 bg-slate-50 rounded border border-slate-200 text-slate-600"><strong>Gợi ý đáp án của GV:</strong> ${q.explain}</div>` : ''}
+            `;
+          }
+
           container.appendChild(card);
         });
       }
@@ -958,63 +1045,79 @@ D. 45
       document.getElementById('modal-detail').classList.remove('hidden');
     }
 
+    function saveGradingResult() {
+      if (!currentViewingSubId) return;
+
+      const newScore = parseFloat(document.getElementById('grading-score').value) || 0;
+      const feedback = document.getElementById('grading-feedback').value.trim();
+
+      const sub = dbSubmissions.find(s => s.id === currentViewingSubId);
+      if (sub) {
+        sub.score = newScore;
+        sub.teacherFeedback = feedback;
+        sub.isGraded = true;
+
+        localStorage.setItem('edu_submissions_data_v2', JSON.stringify(dbSubmissions));
+        alert('Đã lưu điểm số và lời nhận xét thành công!');
+        renderSubmissionsTable();
+      }
+    }
+
     function closeDetailModal() {
       document.getElementById('modal-detail').classList.add('hidden');
     }
 
-    // Xuất kết quả ra file Excel (CSV hỗ trợ tiếng Việt UTF-8 BOM)
     function exportToCSV() {
       if (dbSubmissions.length === 0) {
-        alert('Chưa có dữ liệu bài nộp để xuất!');
+        alert('Chưa có dữ liệu bài nộp để xuất file!');
         return;
       }
 
-      let csv = '\uFEFF'; // UTF-8 BOM
-      csv += 'Họ và tên,Lớp,Đề kiểm tra,Thời gian nộp,Số câu đúng,Tổng số câu,Điểm số\n';
+      let csv = '\uFEFF';
+      csv += 'Họ và tên,Lớp,Đề kiểm tra,Thời gian nộp,Số câu trắc nghiệm đúng,Tổng điểm,Lời nhận xét của GV\n';
 
       dbSubmissions.forEach(s => {
-        csv += `"${s.studentName}","${s.studentClass}","${s.examTitle}","${s.submittedAt}","${s.correctCount}","${s.totalQuestions}","${s.score}"\n`;
+        csv += `"${s.studentName}","${s.studentClass}","${s.examTitle}","${s.submittedAt}","${s.choiceCorrect}/${s.choiceTotal}","${s.score}","${s.teacherFeedback || ''}"\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Ket_Qua_Thi_${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute('download', `Bang_Diem_${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
 
     function clearAllSubmissions() {
-      if (confirm('Bạn có chắc chắn muốn xóa tất cả bài làm và điểm số của học sinh không? Thao tác này không thể hoàn tác!')) {
+      if (confirm('Bạn có chắc chắn muốn xóa tất cả kết quả nộp bài của học sinh?')) {
         dbSubmissions = [];
-        localStorage.removeItem('edu_submissions_data');
+        localStorage.removeItem('edu_submissions_data_v2');
         renderSubmissionsTable();
         document.getElementById('submission-count-badge').textContent = '0';
       }
     }
 
-    function loadSampleQuestionsText() {
+    function loadSampleText() {
       document.getElementById('raw-questions-text').value = 
-`Câu 1: Chiến thắng Điện Biên Phủ diễn ra vào năm nào?
-A. 1945
-B. 1954
-C. 1975
-D. 1968
+`Câu 1 (NB - Bài 1): Sản phẩm nào sau đây là sản phẩm của ngành trồng trọt cung cấp lương thực cho con người?
+A. Cà phê, chè, cao su.
+B. Lúa, ngô, khoai, sắn.
+C. Cam, xoài, nhãn, vải.
+D. Rau cải, cà chua, hành.
 Đáp án: B
-Giải thích: Chiến thắng Điện Biên Phủ kết thúc thắng lợi ngày 7/5/1954.
 
-Câu 2: Đơn vị đo cường độ dòng điện trong hệ SI là gì?
-A. Vôn (V)
-B. Oát (W)
-C. Ampe (A)
-D. Ôm (Ω)
-Đáp án: C
-Giải thích: Cường độ dòng điện có đơn vị đo là Ampe (A).`;
+Câu 2 (NB - Bài 1): Loại cây nào sau đây thuộc nhóm cây ăn quả?
+A. Cây lúa, cây ngô.
+B. Cây cam, cây bưởi, cây xoài.
+C. Cây cà phê, cây chè.
+D. Cây rau muống, cây bắp cải.
+Đáp án: B
+
+Câu 3 (Tự luận): Em hãy nêu vai trò quan trọng của ngành trồng trọt đối với đời sống con người và phát triển kinh tế?`;
     }
 
-    // Khởi chạy khi load trang
     window.addEventListener('DOMContentLoaded', () => {
       renderStudentExamDropdown();
     });
