@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ Thống Kiểm Tra Trực Tuyến - THCS Bình Dương</title>
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('home')">
+        <div class="bg-white text-indigo-700 p-2 rounded-lg font-black text-xl shadow">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div>
+          <h1 class="text-lg md:text-xl font-bold tracking-tight">HỆ THỐNG THI TRỰC TUYẾN</h1>
+          <p class="text-xs text-indigo-200">Trường THCS Bình Dương</p>
+        </div>
+      </div>
+      
+      <!-- Nút thao tác góc phải -->
+      <div id="nav-actions" class="flex items-center space-x-2">
+        <button id="btn-login-modal" onclick="openLoginModal()" class="bg-indigo-800 hover:bg-indigo-900 px-3 py-1.5 rounded-lg text-sm font-medium border border-indigo-500 transition">
+          <i class="fa-solid fa-lock mr-1.5"></i> Cổng Giáo Viên
+        </button>
+        <div id="teacher-menu" class="hidden items-center space-x-2">
+          <span class="text-xs bg-indigo-900 text-indigo-200 px-2.5 py-1 rounded-full border border-indigo-500 font-medium">
+            <i class="fa-solid fa-user-check text-emerald-400 mr-1"></i> Giáo viên: Hồng Yến
+          </span>
+          <button onclick="logoutTeacher()" class="bg-rose-600 hover:bg-rose-700 text-xs px-3 py-1.5 rounded-lg font-medium transition">
+            <i class="fa-solid fa-right-from-bracket mr-1"></i> Đăng xuất
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6">
+
+    <!-- 1. GIAO DIỆN HỌC SINH CHỌN ĐỀ THI -->
+    <section id="section-home" class="space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center max-w-2xl mx-auto">
+        <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+          <i class="fa-solid fa-user-pen"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">Phòng Thi Trực Tuyến Học Sinh</h2>
+        <p class="text-sm text-slate-500 mb-6">Vui lòng nhập họ tên, chọn lớp và chọn bài kiểm tra để bắt đầu.</p>
+        
+        <div class="space-y-4 text-left">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Họ và tên học sinh *</label>
+            <input type="text" id="student-name" placeholder="Ví dụ: Nguyễn Văn An" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Lớp học *</label>
+            <input type="text" id="student-class" placeholder="Ví dụ: 9A1" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Chọn bài kiểm tra *</label>
+            <select id="student-exam-select" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white transition">
+              <!-- Render danh sách đề -->
+            </select>
+          </div>
+          <button onclick="startExam()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-200 transition mt-2 flex items-center justify-center">
+            <i class="fa-solid fa-play mr-2"></i> Bắt đầu làm bài
+          </button>
+        </div>
+      </div>
+
+      <!-- Thông tin lưu ý -->
+      <div class="max-w-2xl mx-auto bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start space-x-3 text-amber-800 text-xs">
+        <i class="fa-solid fa-circle-info text-amber-500 mt-0.5 text-sm"></i>
+        <div>
+          <strong>Lưu ý đối với học sinh:</strong> Khi làm xong, bấm nộp bài để hệ thống ghi nhận. Đáp án và kết quả chấm điểm sẽ được giáo viên quản lý và công bố sau.
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. GIAO DIỆN LÀM BÀI CỦA HỌC SINH -->
+    <section id="section-exam" class="hidden space-y-6">
+      <!-- Thanh thông tin bài thi -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap justify-between items-center gap-4">
+        <div>
+          <h2 id="exam-doing-title" class="text-lg font-bold text-slate-800">Bài Kiểm Tra</h2>
+          <p class="text-xs text-slate-500">Thí sinh: <span id="exam-doing-student" class="font-semibold text-slate-700"></span></p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1.5 rounded-lg flex items-center font-mono font-bold text-base">
+            <i class="fa-regular fa-clock mr-2"></i>
+            <span id="countdown-timer">--:--</span>
+          </div>
+          <button onclick="confirmSubmitExam()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow transition">
+            <i class="fa-solid fa-check mr-1.5"></i> Nộp bài
+          </button>
+        </div>
+      </div>
+
+      <!-- File đính kèm đề thi nếu có -->
+      <div id="attached-file-box" class="hidden bg-indigo-50 border border-indigo-200 p-4 rounded-xl items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-file-lines text-2xl text-indigo-600"></i>
+          <div>
+            <p class="text-xs text-indigo-500 font-medium">Tệp đề thi giáo viên tải lên:</p>
+            <p id="attached-filename" class="text-sm font-bold text-slate-800">de_thi.pdf</p>
+          </div>
+        </div>
+        <a id="btn-download-attached" href="#" download class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3.5 py-2 rounded-lg font-medium transition flex items-center">
+          <i class="fa-solid fa-download mr-1.5"></i> Tải về / Mở file
+        </a>
+      </div>
+
+      <!-- Danh sách câu hỏi -->
+      <div id="questions-container" class="space-y-4">
+        <!-- Render động câu hỏi -->
+      </div>
+
+      <div class="text-center py-4">
+        <button onclick="confirmSubmitExam()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold text-base shadow-lg shadow-emerald-200 transition">
+          <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Xác nhận hoàn thành & Nộp bài
+        </button>
+      </div>
+    </section>
+
+    <!-- 3. MÀN HÌNH NỘP BÀI THÀNH CÔNG CHO HỌC SINH -->
+    <section id="section-student-finished" class="hidden max-w-lg mx-auto py-12 text-center">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 space-y-4">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800">Đã nộp bài thành công!</h2>
+        <p class="text-sm text-slate-600">
+          Bài làm của em <strong><span id="submitted-student-name"></span></strong> đã được lưu trữ an toàn vào hệ thống.
+        </p>
+        <p class="text-xs text-slate-400 border-t border-slate-100 pt-3">
+          Kết quả và bài làm chỉ giáo viên bộ môn mới có quyền truy cập và chấm điểm.
+        </p>
+        <div class="pt-4">
+          <button onclick="backToHome()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition">
+            Về trang chủ
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. DASHBOARD QUẢN LÝ DÀNH RIÊNG CHO GIÁO VIÊN (ĐÃ BẢO VỆ) -->
+    <section id="section-teacher" class="hidden space-y-6">
+      
+      <!-- Tabs Giáo viên -->
+      <div class="flex space-x-2 border-b border-slate-200 pb-2">
+        <button onclick="switchTeacherTab('upload')" id="tab-btn-upload" class="px-4 py-2 font-semibold text-sm rounded-lg bg-indigo-600 text-white shadow">
+          <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Tạo / Tải Đề Thi
+        </button>
+        <button onclick="switchTeacherTab('results')" id="tab-btn-results" class="px-4 py-2 font-semibold text-sm rounded-lg text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-square-poll-vertical mr-1.5"></i> Quản Lý Bài Học Sinh & Điểm (<span id="submission-count-badge">0</span>)
+        </button>
+      </div>
+
+      <!-- Tab 1: Upload Đề -->
+      <div id="teacher-tab-upload" class="space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Box Upload file từ máy -->
+          <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h3 class="text-base font-bold text-slate-800 flex items-center">
+              <i class="fa-solid fa-file-circle-plus text-indigo-600 mr-2"></i> Tải đề thi từ máy tính (Mọi định dạng)
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Tên bài kiểm tra *</label>
+                <input type="text" id="new-exam-title" placeholder="VD: Kiểm tra 15 phút - Đại số 9" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Thời gian làm bài (Phút)</label>
+                <input type="number" id="new-exam-duration" value="15" min="1" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+              </div>
+            </div>
+
+            <!-- Khu vực kéo thả file -->
+            <div class="border-2 border-dashed border-slate-300 hover:border-indigo-400 bg-slate-50 hover:bg-indigo-50/40 rounded-2xl p-6 text-center cursor-pointer transition relative" onclick="document.getElementById('file-upload-input').click()">
+              <input type="file" id="file-upload-input" class="hidden" onchange="handleFileUpload(event)">
+              <div class="w-12 h-12 bg-white text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-sm text-xl">
+                <i class="fa-solid fa-upload"></i>
+              </div>
+              <p class="text-sm font-semibold text-slate-700">Bấm để chọn file hoặc kéo thả tệp bất kỳ từ máy vi tính</p>
+              <p class="text-xs text-slate-500 mt-1">Hỗ trợ mọi định dạng: .txt, .json, .csv, .doc, .docx, .pdf, ảnh, zip...</p>
+              <div id="upload-status" class="mt-3 text-xs font-semibold text-indigo-700 hidden"></div>
+            </div>
+
+            <!-- Soạn nhanh câu hỏi dạng text nếu muốn -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                  Nội dung câu hỏi trắc nghiệm (Tự động nhận diện hoặc nhập tay):
+                </label>
+                <button type="button" onclick="loadSampleQuestionsText()" class="text-xs text-indigo-600 hover:underline">
+                  <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Điền văn bản mẫu
+                </button>
+              </div>
+              <textarea id="raw-questions-text" rows="8" placeholder="Câu 1: Thủ đô của Việt Nam là gì?
+A. TP.HCM
+B. Hà Nội
+C. Đà Nẵng
+D. Cần Thơ
+Đáp án: B
+Giải thích: Hà Nội là thủ đô của nước CHXHCN Việt Nam.
+
+Câu 2: 15 + 25 = ?
+A. 30
+B. 35
+C. 40
+D. 45
+Đáp án: C" class="w-full p-3 font-mono text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none leading-relaxed"></textarea>
+            </div>
+
+            <button onclick="saveNewExam()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl text-sm shadow transition flex items-center justify-center">
+              <i class="fa-solid fa-floppy-disk mr-2"></i> Lưu bài kiểm tra lên hệ thống
+            </button>
+          </div>
+
+          <!-- Danh sách đề đã có -->
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col">
+            <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center">
+              <i class="fa-solid fa-list-check text-indigo-600 mr-2"></i> Danh Sách Đề Hiện Có
+            </h3>
+            <div id="teacher-exam-list" class="flex-grow space-y-3 overflow-y-auto max-h-[480px] custom-scrollbar pr-1">
+              <!-- Render đề -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tab 2: Kết quả học sinh & Chấm điểm -->
+      <div id="teacher-tab-results" class="hidden space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-800">Bảng Điểm & Bài Làm Của Học Viên</h3>
+              <p class="text-xs text-slate-500">Chỉ giáo viên mới có thể xem chi tiết đáp án và chấm bài.</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3.5 py-2 rounded-lg font-medium transition flex items-center shadow-sm">
+                <i class="fa-solid fa-file-excel mr-1.5"></i> Xuất kết quả (Excel)
+              </button>
+              <button onclick="clearAllSubmissions()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs px-3 py-2 rounded-lg font-medium transition border border-rose-200">
+                <i class="fa-solid fa-trash-can mr-1"></i> Xóa toàn bộ kết quả
+              </button>
+            </div>
+          </div>
+
+          <!-- Bảng danh sách bài nộp -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-xs uppercase text-slate-500 border-y border-slate-200">
+                <tr>
+                  <th class="py-3 px-3">Học sinh</th>
+                  <th class="py-3 px-2">Lớp</th>
+                  <th class="py-3 px-3">Bài kiểm tra</th>
+                  <th class="py-3 px-2">Thời gian nộp</th>
+                  <th class="py-3 px-2 text-center">Số câu đúng</th>
+                  <th class="py-3 px-2 text-center">Điểm số</th>
+                  <th class="py-3 px-3 text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="submission-table-body" class="divide-y divide-slate-100">
+                <!-- Render kết quả -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MODAL: ĐĂNG NHẬP GIÁO VIÊN (BẢO MẬT) -->
+  <div id="modal-login" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+      <div class="text-center mb-5">
+        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800">Xác thực quyền Giáo Viên</h3>
+        <p class="text-xs text-slate-500">Vui lòng nhập định danh để xem đáp án và quản lý</p>
+      </div>
+      
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Tài khoản</label>
+          <input type="text" id="login-id" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Mật khẩu</label>
+          <input type="password" id="login-pass" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <div id="login-error" class="text-xs text-rose-600 font-medium hidden">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> Tài khoản hoặc mật khẩu không chính xác!
+        </div>
+        <div class="flex space-x-2 pt-2">
+          <button type="button" onclick="closeLoginModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-xl transition">
+            Đóng
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition shadow">
+            Đăng nhập
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: XEM CHI TIẾT BÀI LÀM CỦA HỌC SINH (CHỈ GIÁO VIÊN XEM ĐƯỢC) -->
+  <div id="modal-detail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+        <div>
+          <h3 class="text-base font-bold text-slate-800" id="detail-modal-title">Chi tiết bài thi học sinh</h3>
+          <p class="text-xs text-slate-500" id="detail-modal-sub"></p>
+        </div>
+        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-4 custom-scrollbar flex-grow" id="detail-modal-content">
+        <!-- Render chi tiết từng câu học sinh làm -->
+      </div>
+      <div class="p-3 border-t border-slate-200 bg-slate-50 text-right">
+        <button onclick="closeDetailModal()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg">
+          Đóng cửa sổ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       HỆ THỐNG DỮ LIỆU & BẢO MẬT
+       ========================================================= */
+    const AUTH_ID = "HongyenTHCSBinhDuong";
+    const AUTH_PASS = "123456";
+
+    // Khởi tạo cơ sở dữ liệu mẫu trong LocalStorage
+    let dbExams = JSON.parse(localStorage.getItem('edu_exams_data') || '[]');
+    let dbSubmissions = JSON.parse(localStorage.getItem('edu_submissions_data') || '[]');
+    let currentUploadedAttachment = null; // Tệp bất kỳ upload kèm theo đề
+
+    if (dbExams.length === 0) {
+      dbExams = [
+        {
+          id: 'exam_demo_01',
+          title: 'Khảo sát chất lượng Toán 9 - Bài mở đầu',
+          duration: 15,
+          createdAt: new Date().toISOString(),
+          attachment: null,
+          questions: [
+            {
+              id: 1,
+              question: "Căn bậc hai số học của 9 là bao nhiêu?",
+              options: ["3", "-3", "81", "±3"],
+              correct: 0,
+              explain: "Căn bậc hai số học của số a không âm là số x không âm sao cho x^2 = a. Do đó √9 = 3."
+            },
+            {
+              id: 2,
+              question: "Biểu thức √(2x - 4) có nghĩa khi nào?",
+              options: ["x ≥ 2", "x > 2", "x ≤ 2", "x = 2"],
+              correct: 0,
+              explain: "Biểu thức có nghĩa khi 2x - 4 ≥ 0 <=> 2x ≥ 4 <=> x ≥ 2."
+            },
+            {
+              id: 3,
+              question: "Kết quả của phép tính √(3 - 2√2) là:",
+              options: ["√2 - 1", "1 - √2", "3 - 2√2", "√2 + 1"],
+              correct: 0,
+              explain: "√(3 - 2√2) = √((√2 - 1)^2) = |√2 - 1| = √2 - 1 (do √2 > 1)."
+            }
+          ]
+        }
+      ];
+      localStorage.setItem('edu_exams_data', JSON.stringify(dbExams));
+    }
+
+    // Biến phiên thi của học sinh
+    let currentExam = null;
+    let studentInfo = { name: '', class: '' };
+    let studentAnswers = {};
+    let timerInterval = null;
+    let timeRemaining = 0;
+    let isTeacherLoggedIn = false;
+
+    /* =========================================================
+       XÁC THỰC GIÁO VIÊN
+       ========================================================= */
+    function openLoginModal() {
+      document.getElementById('login-id').value = '';
+      document.getElementById('login-pass').value = '';
+      document.getElementById('login-error').classList.add('hidden');
+      document.getElementById('modal-login').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('modal-login').classList.add('hidden');
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const idVal = document.getElementById('login-id').value.trim();
+      const passVal = document.getElementById('login-pass').value.trim();
+
+      if (idVal === AUTH_ID && passVal === AUTH_PASS) {
+        isTeacherLoggedIn = true;
+        closeLoginModal();
+        document.getElementById('btn-login-modal').classList.add('hidden');
+        document.getElementById('teacher-menu').classList.remove('hidden');
+        document.getElementById('teacher-menu').classList.add('flex');
+        showSection('teacher');
+        renderTeacherDashboard();
+      } else {
+        document.getElementById('login-error').classList.remove('hidden');
+      }
+    }
+
+    function logoutTeacher() {
+      isTeacherLoggedIn = false;
+      document.getElementById('btn-login-modal').classList.remove('hidden');
+      document.getElementById('teacher-menu').classList.add('hidden');
+      document.getElementById('teacher-menu').classList.remove('flex');
+      showSection('home');
+      renderStudentExamDropdown();
+    }
+
+    /* =========================================================
+       ĐIỀU HƯỚNG MÀN HÌNH
+       ========================================================= */
+    function showSection(name) {
+      document.getElementById('section-home').classList.add('hidden');
+      document.getElementById('section-exam').classList.add('hidden');
+      document.getElementById('section-student-finished').classList.add('hidden');
+      document.getElementById('section-teacher').classList.add('hidden');
+
+      if (name === 'home') document.getElementById('section-home').classList.remove('hidden');
+      if (name === 'exam') document.getElementById('section-exam').classList.remove('hidden');
+      if (name === 'finished') document.getElementById('section-student-finished').classList.remove('hidden');
+      if (name === 'teacher') {
+        if (!isTeacherLoggedIn) {
+          openLoginModal();
+          return;
+        }
+        document.getElementById('section-teacher').classList.remove('hidden');
+      }
+    }
+
+    /* =========================================================
+       HỌC SINH LÀM BÀI
+       ========================================================= */
+    function renderStudentExamDropdown() {
+      const select = document.getElementById('student-exam-select');
+      select.innerHTML = '';
+      if (dbExams.length === 0) {
+        select.innerHTML = '<option value="">Chưa có bài thi nào trên hệ thống</option>';
+        return;
+      }
+      dbExams.forEach(exam => {
+        const count = exam.questions ? exam.questions.length : 0;
+        const opt = document.createElement('option');
+        opt.value = exam.id;
+        opt.textContent = `${exam.title} (${count} câu - ${exam.duration} phút)`;
+        select.appendChild(opt);
+      });
+    }
+
+    function startExam() {
+      const name = document.getElementById('student-name').value.trim();
+      const sClass = document.getElementById('student-class').value.trim();
+      const examId = document.getElementById('student-exam-select').value;
+
+      if (!name || !sClass) {
+        alert('Vui lòng nhập đầy đủ Họ tên và Lớp của em!');
+        return;
+      }
+      if (!examId) {
+        alert('Chưa có bài kiểm tra nào được chọn!');
+        return;
+      }
+
+      currentExam = dbExams.find(e => e.id === examId);
+      if (!currentExam) return;
+
+      studentInfo = { name, class: sClass };
+      studentAnswers = {};
+
+      document.getElementById('exam-doing-title').textContent = currentExam.title;
+      document.getElementById('exam-doing-student').textContent = `${name} - Lớp: ${sClass}`;
+
+      // Xử lý nếu đề có đính kèm file (PDF, Docx, Ảnh...)
+      const attachedBox = document.getElementById('attached-file-box');
+      if (currentExam.attachment) {
+        attachedBox.classList.remove('hidden');
+        attachedBox.classList.add('flex');
+        document.getElementById('attached-filename').textContent = currentExam.attachment.name;
+        document.getElementById('btn-download-attached').href = currentExam.attachment.dataUrl;
+        document.getElementById('btn-download-attached').download = currentExam.attachment.name;
+      } else {
+        attachedBox.classList.add('hidden');
+        attachedBox.classList.remove('flex');
+      }
+
+      renderQuestionsForStudent();
+      startTimer(currentExam.duration * 60);
+      showSection('exam');
+    }
+
+    function renderQuestionsForStudent() {
+      const container = document.getElementById('questions-container');
+      container.innerHTML = '';
+
+      if (!currentExam.questions || currentExam.questions.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white p-8 rounded-xl border border-slate-200 text-center">
+            <p class="text-slate-600 font-medium">Đề thi này không có câu hỏi trắc nghiệm tự động. Vui lòng tải file đính kèm phía trên để làm bài!</p>
+          </div>
+        `;
+        return;
+      }
+
+      currentExam.questions.forEach((q, idx) => {
+        const qCard = document.createElement('div');
+        qCard.className = "bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3";
+        
+        let optsHtml = '';
+        const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+        q.options.forEach((opt, oIdx) => {
+          optsHtml += `
+            <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 hover:bg-indigo-50/40 cursor-pointer transition">
+              <input type="radio" name="question_${q.id}" value="${oIdx}" onchange="selectAnswer(${q.id}, ${oIdx})" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+              <span class="font-bold text-xs text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${labels[oIdx]}</span>
+              <span class="text-sm text-slate-700">${opt}</span>
+            </label>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <div class="flex items-start space-x-2">
+            <span class="bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-md">Câu ${idx + 1}</span>
+            <div class="text-sm md:text-base font-semibold text-slate-800">${q.question}</div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
+            ${optsHtml}
+          </div>
+        `;
+        container.appendChild(qCard);
+      });
+    }
+
+    function selectAnswer(qid, optIndex) {
+      studentAnswers[qid] = optIndex;
+    }
+
+    function startTimer(seconds) {
+      clearInterval(timerInterval);
+      timeRemaining = seconds;
+      updateTimerDisplay();
+
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          alert('Đã hết thời gian làm bài! Hệ thống sẽ tự động lưu bài.');
+          submitExam();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timeRemaining / 60);
+      const secs = timeRemaining % 60;
+      document.getElementById('countdown-timer').textContent = 
+        `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function confirmSubmitExam() {
+      if (confirm('Em có chắc chắn muốn hoàn thành và nộp bài kiểm tra này không?')) {
+        submitExam();
+      }
+    }
+
+    function submitExam() {
+      clearInterval(timerInterval);
+
+      // Tính điểm
+      let correctCount = 0;
+      const total = currentExam.questions ? currentExam.questions.length : 0;
+
+      if (total > 0) {
+        currentExam.questions.forEach(q => {
+          if (studentAnswers[q.id] !== undefined && studentAnswers[q.id] === q.correct) {
+            correctCount++;
+          }
+        });
+      }
+
+      const score = total > 0 ? ((correctCount / total) * 10).toFixed(2) : 0;
+
+      // Lưu trữ thông tin bài nộp
+      const submission = {
+        id: 'sub_' + Date.now(),
+        examId: currentExam.id,
+        examTitle: currentExam.title,
+        studentName: studentInfo.name,
+        studentClass: studentInfo.class,
+        submittedAt: new Date().toLocaleString('vi-VN'),
+        answers: { ...studentAnswers },
+        correctCount: correctCount,
+        totalQuestions: total,
+        score: score
+      };
+
+      dbSubmissions.push(submission);
+      localStorage.setItem('edu_submissions_data', JSON.stringify(dbSubmissions));
+
+      // Hiển thị màn hình hoàn thành cho học sinh (Tuyệt đối KHÔNG hiển thị điểm hay đáp án)
+      document.getElementById('submitted-student-name').textContent = studentInfo.name;
+      showSection('finished');
+    }
+
+    function backToHome() {
+      document.getElementById('student-name').value = '';
+      document.getElementById('student-class').value = '';
+      showSection('home');
+    }
+
+    /* =========================================================
+       GIÁO VIÊN: TẢI ĐỀ BẤT KỲ ĐỊNH DẠNG & QUẢN LÝ
+       ========================================================= */
+    function switchTeacherTab(tab) {
+      if (tab === 'upload') {
+        document.getElementById('teacher-tab-upload').classList.remove('hidden');
+        document.getElementById('teacher-tab-results').classList.add('hidden');
+        document.getElementById('tab-btn-upload').className = "px-4 py-2 font-semibold text-sm rounded-lg bg-indigo-600 text-white shadow";
+        document.getElementById('tab-btn-results').className = "px-4 py-2 font-semibold text-sm rounded-lg text-slate-600 hover:bg-slate-200";
+      } else {
+        document.getElementById('teacher-tab-upload').classList.add('hidden');
+        document.getElementById('teacher-tab-results').classList.remove('hidden');
+        document.getElementById('tab-btn-results').className = "px-4 py-2 font-semibold text-sm rounded-lg bg-indigo-600 text-white shadow";
+        document.getElementById('tab-btn-upload').className = "px-4 py-2 font-semibold text-sm rounded-lg text-slate-600 hover:bg-slate-200";
+        renderSubmissionsTable();
+      }
+    }
+
+    // Xử lý upload mọi loại file
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById('upload-status');
+      statusEl.classList.remove('hidden');
+      statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang tải và phân tích tệp: <strong>${file.name}</strong>...`;
+
+      // Đặt tên đề mặc định nếu chưa nhập
+      const titleInput = document.getElementById('new-exam-title');
+      if (!titleInput.value) {
+        titleInput.value = file.name.replace(/\.[^/.]+$/, "");
+      }
+
+      // Lưu file dưới dạng DataURL để học sinh có thể tải về được bất kể định dạng nào
+      const readerData = new FileReader();
+      readerData.onload = function(e) {
+        currentUploadedAttachment = {
+          name: file.name,
+          type: file.type,
+          dataUrl: e.target.result
+        };
+      };
+      readerData.readAsDataURL(file);
+
+      // Thử đọc văn bản nếu là file dạng text/json/csv
+      const textReader = new FileReader();
+      textReader.onload = function(e) {
+        const content = e.target.result;
+        try {
+          // Thử parse JSON
+          const parsed = JSON.parse(content);
+          if (Array.isArray(parsed) || parsed.questions) {
+            statusEl.innerHTML = `✅ Nhận diện thành công cấu trúc đề JSON (${(parsed.questions || parsed).length} câu).`;
+            document.getElementById('raw-questions-text').value = content;
+            return;
+          }
+        } catch (err) {}
+
+        // Nếu là text thông thường, đưa vào ô nhập liệu để parser quét câu hỏi
+        document.getElementById('raw-questions-text').value = content;
+        statusEl.innerHTML = `✅ Đã nạp nội dung văn bản từ tệp <strong>${file.name}</strong>.`;
+      };
+      
+      // Đọc dạng text (nếu file nhị phân như PDF/Docx thì vẫn lưu attachment để học sinh mở trực tiếp)
+      textReader.readAsText(file);
+    }
+
+    // Tự động phân tích chuỗi văn bản thành câu hỏi
+    function parseQuestionsFromRawText(text) {
+      if (!text || !text.trim()) return [];
+
+      // Kiểm tra xem có phải JSON không
+      try {
+        const json = JSON.parse(text);
+        if (Array.isArray(json)) return json;
+        if (json.questions && Array.isArray(json.questions)) return json.questions;
+      } catch (e) {}
+
+      // Phân tích dạng văn bản Câu 1, Câu 2... A, B, C, D
+      const questions = [];
+      const blocks = text.split(/(?=Câu\s*\d+[:.])/gi);
+
+      blocks.forEach((block, idx) => {
+        const trimmed = block.trim();
+        if (!trimmed) return;
+
+        const lines = trimmed.split('\n').map(l => l.trim()).filter(l => l);
+        let qTitle = lines[0] || `Câu hỏi ${idx + 1}`;
+        // Lược bỏ chữ Câu 1: nếu muốn gọn
+        qTitle = qTitle.replace(/^Câu\s*\d+[:.]\s*/i, '');
+
+        let options = [];
+        let correct = 0;
+        let explain = "";
+
+        lines.slice(1).forEach(line => {
+          const optMatch = line.match(/^([A-D])[\.\:\)]\s*(.*)/i);
+          const ansMatch = line.match(/^Đáp án[\:\s]+([A-D])/i);
+          const expMatch = line.match(/^Giải thích[\:\s]+(.*)/i);
+
+          if (optMatch) {
+            options.push(optMatch[2]);
+          } else if (ansMatch) {
+            const letter = ansMatch[1].toUpperCase();
+            correct = ['A', 'B', 'C', 'D'].indexOf(letter);
+            if (correct === -1) correct = 0;
+          } else if (expMatch) {
+            explain = expMatch[1];
+          }
+        });
+
+        if (options.length >= 2) {
+          questions.push({
+            id: idx + 1,
+            question: qTitle,
+            options: options,
+            correct: correct,
+            explain: explain || "Đáp án chính xác do giáo viên chỉ định."
+          });
+        }
+      });
+
+      return questions;
+    }
+
+    function saveNewExam() {
+      const title = document.getElementById('new-exam-title').value.trim();
+      const duration = parseInt(document.getElementById('new-exam-duration').value) || 15;
+      const rawText = document.getElementById('raw-questions-text').value;
+
+      if (!title) {
+        alert('Vui lòng nhập Tên bài kiểm tra!');
+        return;
+      }
+
+      const questions = parseQuestionsFromRawText(rawText);
+
+      if (questions.length === 0 && !currentUploadedAttachment) {
+        alert('Vui lòng tải tệp đề bài lên hoặc nhập ít nhất một câu hỏi trắc nghiệm!');
+        return;
+      }
+
+      const newExam = {
+        id: 'exam_' + Date.now(),
+        title: title,
+        duration: duration,
+        createdAt: new Date().toISOString(),
+        attachment: currentUploadedAttachment,
+        questions: questions
+      };
+
+      dbExams.unshift(newExam);
+      localStorage.setItem('edu_exams_data', JSON.stringify(dbExams));
+
+      // Reset form
+      document.getElementById('new-exam-title').value = '';
+      document.getElementById('raw-questions-text').value = '';
+      document.getElementById('file-upload-input').value = '';
+      document.getElementById('upload-status').classList.add('hidden');
+      currentUploadedAttachment = null;
+
+      alert(`Đã lưu bài kiểm tra "${title}" thành công!`);
+      renderTeacherDashboard();
+      renderStudentExamDropdown();
+    }
+
+    function deleteExam(id) {
+      if (confirm('Bạn có chắc muốn xóa bài kiểm tra này?')) {
+        dbExams = dbExams.filter(e => e.id !== id);
+        localStorage.setItem('edu_exams_data', JSON.stringify(dbExams));
+        renderTeacherDashboard();
+        renderStudentExamDropdown();
+      }
+    }
+
+    function renderTeacherDashboard() {
+      // Cập nhật số bài nộp
+      document.getElementById('submission-count-badge').textContent = dbSubmissions.length;
+
+      // Danh sách đề thi
+      const listEl = document.getElementById('teacher-exam-list');
+      listEl.innerHTML = '';
+
+      if (dbExams.length === 0) {
+        listEl.innerHTML = '<p class="text-xs text-slate-400 italic">Chưa có đề nào.</p>';
+        return;
+      }
+
+      dbExams.forEach(exam => {
+        const qCount = exam.questions ? exam.questions.length : 0;
+        const item = document.createElement('div');
+        item.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs";
+        item.innerHTML = `
+          <div class="space-y-0.5 max-w-[70%]">
+            <h4 class="font-bold text-slate-800 truncate">${exam.title}</h4>
+            <p class="text-slate-500">${qCount} câu hỏi • ${exam.duration} phút ${exam.attachment ? '• 📎 Đính kèm tệp' : ''}</p>
+          </div>
+          <button onclick="deleteExam('${exam.id}')" class="text-rose-600 hover:text-rose-800 p-1.5" title="Xóa đề">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        `;
+        listEl.appendChild(item);
+      });
+    }
+
+    // Bảng nộp bài của học sinh
+    function renderSubmissionsTable() {
+      const tbody = document.getElementById('submission-table-body');
+      tbody.innerHTML = '';
+
+      if (dbSubmissions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-8 text-center text-slate-400 italic">Chưa có học sinh nào nộp bài.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Sắp xếp bài mới nhất lên đầu
+      const sorted = [...dbSubmissions].reverse();
+
+      sorted.forEach(sub => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50/80 transition";
+        tr.innerHTML = `
+          <td class="py-3 px-3 font-semibold text-slate-800">${sub.studentName}</td>
+          <td class="py-3 px-2">${sub.studentClass}</td>
+          <td class="py-3 px-3 text-indigo-700 font-medium truncate max-w-xs">${sub.examTitle}</td>
+          <td class="py-3 px-2 text-xs text-slate-400">${sub.submittedAt}</td>
+          <td class="py-3 px-2 text-center font-semibold text-slate-700">${sub.correctCount}/${sub.totalQuestions}</td>
+          <td class="py-3 px-2 text-center">
+            <span class="inline-block px-2.5 py-1 rounded-full text-xs font-bold ${
+              sub.score >= 8 ? 'bg-emerald-100 text-emerald-800' :
+              sub.score >= 5 ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
+            }">
+              ${sub.score}
+            </span>
+          </td>
+          <td class="py-3 px-3 text-center">
+            <button onclick="viewSubmissionDetail('${sub.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg text-xs font-medium border border-indigo-200 transition">
+              <i class="fa-solid fa-eye mr-1"></i> Xem bài làm
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Modal xem chi tiết từng câu của học sinh
+    function viewSubmissionDetail(subId) {
+      const sub = dbSubmissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      const exam = dbExams.find(e => e.id === sub.examId);
+      
+      document.getElementById('detail-modal-title').textContent = `Bài làm của: ${sub.studentName} (Lớp ${sub.studentClass})`;
+      document.getElementById('detail-modal-sub').textContent = `Đề thi: ${sub.examTitle} • Điểm số: ${sub.score}/10 (${sub.correctCount}/${sub.totalQuestions} câu đúng)`;
+
+      const container = document.getElementById('detail-modal-content');
+      container.innerHTML = '';
+
+      if (!exam || !exam.questions || exam.questions.length === 0) {
+        container.innerHTML = '<p class="text-sm text-slate-500">Đề bài không có câu hỏi trắc nghiệm tự động.</p>';
+      } else {
+        const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+        exam.questions.forEach((q, idx) => {
+          const studentAns = sub.answers[q.id];
+          const isCorrect = studentAns !== undefined && studentAns === q.correct;
+          const isAnswered = studentAns !== undefined;
+
+          const card = document.createElement('div');
+          card.className = `p-4 rounded-xl border ${isCorrect ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200'} space-y-2 text-xs`;
+
+          let optionsHtml = '';
+          q.options.forEach((opt, oIdx) => {
+            let optStyle = "border-slate-200 bg-white text-slate-700";
+            if (oIdx === q.correct) {
+              optStyle = "border-emerald-500 bg-emerald-100 font-bold text-emerald-800";
+            }
+            if (oIdx === studentAns && studentAns !== q.correct) {
+              optStyle = "border-rose-400 bg-rose-100 font-bold text-rose-800 line-through";
+            }
+
+            optionsHtml += `
+              <div class="p-2 rounded-lg border ${optStyle} flex items-center justify-between">
+                <span><strong>${labels[oIdx]}.</strong> ${opt}</span>
+                ${oIdx === q.correct ? '<span class="text-emerald-700 font-bold"><i class="fa-solid fa-check"></i> Đáp án đúng</span>' : ''}
+                ${oIdx === studentAns && studentAns !== q.correct ? '<span class="text-rose-700 font-bold"><i class="fa-solid fa-xmark"></i> Học sinh chọn</span>' : ''}
+              </div>
+            `;
+          });
+
+          card.innerHTML = `
+            <div class="flex justify-between items-start">
+              <span class="font-bold text-slate-800 text-sm">Câu ${idx + 1}: ${q.question}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
+                ${isCorrect ? 'ĐÚNG' : (isAnswered ? 'SAI' : 'CHƯA TRẢ LỜI')}
+              </span>
+            </div>
+            <div class="space-y-1.5 pt-1">
+              ${optionsHtml}
+            </div>
+            ${q.explain ? `
+              <div class="bg-white/80 p-2 rounded border border-slate-200 text-slate-600 mt-2">
+                <strong>Lời giải / Ghi chú:</strong> ${q.explain}
+              </div>
+            ` : ''}
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      document.getElementById('modal-detail').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('modal-detail').classList.add('hidden');
+    }
+
+    // Xuất kết quả ra file Excel (CSV hỗ trợ tiếng Việt UTF-8 BOM)
+    function exportToCSV() {
+      if (dbSubmissions.length === 0) {
+        alert('Chưa có dữ liệu bài nộp để xuất!');
+        return;
+      }
+
+      let csv = '\uFEFF'; // UTF-8 BOM
+      csv += 'Họ và tên,Lớp,Đề kiểm tra,Thời gian nộp,Số câu đúng,Tổng số câu,Điểm số\n';
+
+      dbSubmissions.forEach(s => {
+        csv += `"${s.studentName}","${s.studentClass}","${s.examTitle}","${s.submittedAt}","${s.correctCount}","${s.totalQuestions}","${s.score}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Ket_Qua_Thi_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function clearAllSubmissions() {
+      if (confirm('Bạn có chắc chắn muốn xóa tất cả bài làm và điểm số của học sinh không? Thao tác này không thể hoàn tác!')) {
+        dbSubmissions = [];
+        localStorage.removeItem('edu_submissions_data');
+        renderSubmissionsTable();
+        document.getElementById('submission-count-badge').textContent = '0';
+      }
+    }
+
+    function loadSampleQuestionsText() {
+      document.getElementById('raw-questions-text').value = 
+`Câu 1: Chiến thắng Điện Biên Phủ diễn ra vào năm nào?
+A. 1945
+B. 1954
+C. 1975
+D. 1968
+Đáp án: B
+Giải thích: Chiến thắng Điện Biên Phủ kết thúc thắng lợi ngày 7/5/1954.
+
+Câu 2: Đơn vị đo cường độ dòng điện trong hệ SI là gì?
+A. Vôn (V)
+B. Oát (W)
+C. Ampe (A)
+D. Ôm (Ω)
+Đáp án: C
+Giải thích: Cường độ dòng điện có đơn vị đo là Ampe (A).`;
+    }
+
+    // Khởi chạy khi load trang
+    window.addEventListener('DOMContentLoaded', () => {
+      renderStudentExamDropdown();
+    });
+  </script>
+</body>
+</html>
